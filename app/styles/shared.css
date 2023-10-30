@@ -50,13 +50,6 @@
     font-weight:bold;
 
 }
-/*.menuList li a {*/
-/*    display: block;*/
-/*    color: dimgrey;*/
-/*    text-align: center;*/
-/*    padding: 16px;*/
-/*    text-decoration: none;*/
-/*}*/
 
 .menuList li a:hover {
     background-color: lightgrey;
@@ -153,16 +146,34 @@
 }
 
 .sqlInput {
-    background-color: silver;
+    background-color: gainsboro;
     border: none;
     padding:5px;
-    width:350px;
+    width:500px;
+    height: 100px;
     border-radius:5px;
     margin:3px;
 }
 
+
+
 #jobForm button {
-
     border-radius:3px;
+}
 
+.chartPanel {
+    background-color: FFF;
+    border: 1px solid silver;
+    border-radius:6px;
+    margin:10px;
+    padding:10px;
+    color:grey;
+    width:500px;
+}
+
+.sqlTableForm button {
+
+    background-color: silver;
+    margin-left: 15px;
+    margin-bottom:15px;
 }

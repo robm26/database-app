@@ -4,17 +4,28 @@ import {
 
 import React from 'react';
 
-import { Menu } from "~/components/menu";
+import {Menu} from "~/components/menu";
 import {SqlGrid} from "~/components/SqlGrid";
-import {runSql} from "../components/database.mjs";
+import {runPartiQL, runSql} from "../components/database.mjs";
 
 export async function action({ params, request }) {
+
     const body = await request.formData();
+    const _action = body.get("_action");
 
     const sqlInput = (body.get('sqlInput'));
 
     let result;
-    result = await runSql(sqlInput);
+
+    if(_action === 'mysql') {
+        result = await runSql(sqlInput);
+
+    }
+
+    if(_action === 'dynamodb') {
+        result = await runPartiQL(sqlInput);
+
+    }
 
     return({result: result.result, latency: result.latency});
 }
@@ -30,9 +41,6 @@ export default function JobIndex() {
     const data = useLoaderData();
     const actionData = useActionData();
 
-   //  const keepfor = 365;
-   //  const ttl = '  unix_timestamp(date_add(now(),interval ' + keepfor + ' day)) as ttl\n';
-
     let stmt = '';
 
     const [sql, setSql] = React.useState(stmt);
@@ -46,47 +54,52 @@ export default function JobIndex() {
         setSql(val.target.value);
     };
 
-    let rows = 0;
-    let cols = 0;
+    let rowCount;
+
     if(actionData?.result && !actionData?.result?.error) {
         let dataset = actionData?.result;
-        rows = dataset.length;
-        cols = Object.keys(dataset[0]).length;
-        // console.log(JSON.stringify(dataset, null, 2));
+        rowCount = dataset.length;
+
     }
 
-    const defaultSql = 'select * \nfrom customers \nlimit 3';
+    let defaultSql = "select *\n";
+    defaultSql += "from\n  users \nwhere\n  user_id = '1000' ";
+
+    const chartPanel = (<div className='chartPanel'>
+        &lt; Latency chart, MySQL vs DynamoDB &gt;
+    </div>);
 
     const sqlForm = (<Form id="jobForm" method="post"  >
         <table className='sqlTableForm'>
             <thead></thead>
             <tbody><tr><td>
-
                 <label>
-                    <textarea name="sqlInput" className="sqlInput" rows="6" cols="50" defaultValue={defaultSql}>
+                    <textarea name="sqlInput" className="sqlInput"
+                                defaultValue={defaultSql}>
                     </textarea>
                 </label>
-
                 <br/>
-                <br/>
-                <button type='submit'>
-                    RUN SQL
+                <button type='submit' name='_action' value='mysql'>
+                    MySQL
                 </button>
-                &nbsp;&nbsp;&nbsp;
+
+                <button type='submit' name='_action' value='dynamodb'>
+                    DynamoDB PartiQL
+                </button>
+
+                &nbsp;&nbsp;
                 <Link to={'.'} >
                     <button type='submit' onClick={()=>{ clearSql() }} >CLEAR</button>
                 </Link>
-                {/*&nbsp; &nbsp; &nbsp;*/}
-                {/*{rows && rows > 0 ? (<span>rows: {rows}</span>) : null}*/}
-                {/*&nbsp;&nbsp;*/}
-                {/*{cols && cols > 0 ? (<span>columns: {cols}</span>) : null}*/}
-                <br/>
+                &nbsp; &nbsp; &nbsp;
                 {actionData?.latency ? actionData?.latency + ' ms' : ''}
+                &nbsp; &nbsp;
+                {rowCount >= 0 ? (<span>rows: {rowCount}</span>) : null}
+                <br/>
+
             </td></tr></tbody>
         </table>
     </Form>);
-
-   //  let connLabel = {database:data.database, host:data.host};
 
     return (
         <div className="rootContainer">
@@ -94,10 +107,16 @@ export default function JobIndex() {
 
             <div className='sqlContainer'>
                 {sqlForm}
+                {actionData?.latency ? chartPanel : null}
                 <br/>
                 {actionData?.result?.error ?
                     (<div className='errorPanel'>{actionData.result.error?.code}<br/>{actionData.result.error?.sqlMessage}</div>)
-                    : ( <SqlGrid data={actionData?.result} />)
+                    : (
+                        <>
+                            <SqlGrid data={actionData?.result} />
+                        </>
+
+                    )
                 }
 
             </div>

@@ -1,0 +1,9 @@
+{ "TableName": "table1",
+  "Tags": [{"Key": "table_name", "Value": "table1"}],
+  "ProvisionedThroughput": {"WriteCapacityUnits": 5, "ReadCapacityUnits": 5},
+  "AttributeDefinitions": [
+      {"AttributeName": "PK", "AttributeType": "S"}
+
+    ],
+   "KeySchema": [{"KeyType": "HASH", "AttributeName": "PK"}]
+}

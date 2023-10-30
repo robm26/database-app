@@ -3,9 +3,8 @@ export const config = () => {
     return {
 
         "engines": [
-            "insert",
-            "update",
-            "query"
+            "query",
+            "bulk job"
         ]
     };
 };

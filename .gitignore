@@ -9,6 +9,7 @@ node_modules
 .idea
 .DS_Store
 
+test.js
 
-
-
+app/components/mysql-credentials.mjs
+app/components/mysql-credentials-real.mjs
