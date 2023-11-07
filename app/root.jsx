@@ -9,9 +9,13 @@ import {
     ScrollRestoration,
 } from "@remix-run/react";
 
+import favicon from "./components/favicon.ico";
+
 export const links = () => {
     return [
-        {rel:"stylesheet", href:stylesShared}
+        {rel:"stylesheet", href:stylesShared},
+        {rel: 'icon', type: 'image/png', sizes: '32x32', href: favicon},
+        {rel: 'icon', type: 'image/x-icon', href: favicon}
     ];
 };
 

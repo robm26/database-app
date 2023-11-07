@@ -177,3 +177,8 @@
     margin-left: 15px;
     margin-bottom:15px;
 }
+.sqlTableDiv  {
+    border-radius:16px;
+    padding:1px;
+    width: fit-content;
+}

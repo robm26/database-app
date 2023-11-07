@@ -2,11 +2,15 @@ import {
     useLoaderData, Link, Form, useFetcher, useActionData
 }  from "@remix-run/react";
 
+
+
 import React from 'react';
 
 import {Menu} from "~/components/menu";
 import {SqlGrid} from "~/components/SqlGrid";
-import {runPartiQL, runSql} from "../components/database.mjs";
+import { runSql} from "../components/database.mjs";
+import { runPartiQL } from "../components/database.mjs";
+
 
 export async function action({ params, request }) {
 
@@ -27,7 +31,7 @@ export async function action({ params, request }) {
 
     }
 
-    return({result: result.result, latency: result.latency});
+    return({result: result.result, operation: result.operation, latency: result.latency});
 }
 
 export const loader = async ({ params, request }) => {
@@ -40,6 +44,10 @@ export const loader = async ({ params, request }) => {
 export default function JobIndex() {
     const data = useLoaderData();
     const actionData = useActionData();
+    let result = actionData?.result;
+    let affectedRows = result?.affectedRows;
+
+    let operation = actionData?.operation;
 
     let stmt = '';
 
@@ -54,22 +62,36 @@ export default function JobIndex() {
         setSql(val.target.value);
     };
 
-    let rowCount;
+    let rowCount = 0;
+    let Items = [];
 
-    if(actionData?.result && !actionData?.result?.error) {
-        let dataset = actionData?.result;
-        rowCount = dataset.length;
+    if(result && !result?.error ) {
+
+        if(operation === 'select') {
+            Items = result?.Items;
+
+            if(Array.isArray(Items)) {
+                rowCount = Items.length;
+            }
+        } else {
+            rowCount = affectedRows;
+        }
 
     }
 
-    let defaultSql = "select *\n";
-    defaultSql += "from\n  users \nwhere\n  user_id = '1000' ";
+    let defaultSql = "select \n  *\n";
+    defaultSql += "from\n  users"
+    // defaultSql += "\nwhere\n  user_id = '1000' ";
+
+    // defaultSql = "update users set credit_rating = 444 where user_id = '1000' ";
+
 
     const chartPanel = (<div className='chartPanel'>
         &lt; Latency chart, MySQL vs DynamoDB &gt;
     </div>);
 
     const sqlForm = (<Form id="jobForm" method="post"  >
+        <div className='sqlTableDiv'>
         <table className='sqlTableForm'>
             <thead></thead>
             <tbody><tr><td>
@@ -94,11 +116,12 @@ export default function JobIndex() {
                 &nbsp; &nbsp; &nbsp;
                 {actionData?.latency ? actionData?.latency + ' ms' : ''}
                 &nbsp; &nbsp;
-                {rowCount >= 0 ? (<span>rows: {rowCount}</span>) : null}
+                {rowCount !== undefined ? (<span>rows: {rowCount}</span>) : null}
                 <br/>
 
             </td></tr></tbody>
         </table>
+        </div>
     </Form>);
 
     return (
@@ -107,13 +130,19 @@ export default function JobIndex() {
 
             <div className='sqlContainer'>
                 {sqlForm}
+
                 {actionData?.latency ? chartPanel : null}
                 <br/>
-                {actionData?.result?.error ?
-                    (<div className='errorPanel'>{actionData.result.error?.code}<br/>{actionData.result.error?.sqlMessage}</div>)
+                {result?.error && result.error.name !== 'ConditionalCheckFailedException' ?
+                    (<div className='errorPanel'>
+                        {result.error.code}<br/>{result.error?.message}
+                    </div>)
                     : (
                         <>
-                            <SqlGrid data={actionData?.result} />
+                            { Array.isArray(Items) ?
+                                <SqlGrid data={Items} /> :
+                                <p>{operation}</p>
+                            }
                         </>
 
                     )

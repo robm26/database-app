@@ -4,7 +4,8 @@ export const config = () => {
 
         "engines": [
             "query",
-            "bulk job"
+            "job",
+            "about"
         ]
     };
 };
