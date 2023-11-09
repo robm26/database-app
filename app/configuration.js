@@ -2,9 +2,10 @@ export const config = () => {
 
     return {
 
-        "engines": [
+        "menuitems": [
             "query",
-            "job",
+            "jobs",
+            "results",
             "about"
         ]
     };

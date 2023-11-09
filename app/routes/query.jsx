@@ -41,8 +41,8 @@ export const loader = async ({ params, request }) => {
 };
 
 
-export default function JobIndex() {
-    const data = useLoaderData();
+export default function QueryIndex() {
+//     const data = useLoaderData();
     const actionData = useActionData();
     let result = actionData?.result;
     let affectedRows = result?.affectedRows;
@@ -126,7 +126,7 @@ export default function JobIndex() {
 
     return (
         <div className="rootContainer">
-            <Menu  />
+            <Menu page='query' />
 
             <div className='sqlContainer'>
                 {sqlForm}

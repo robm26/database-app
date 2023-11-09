@@ -182,3 +182,8 @@
     padding:1px;
     width: fit-content;
 }
+.jobCode {
+    background-color: green;
+    border: 1px solid gainsboro;
+    border-radius: 5px;
+}

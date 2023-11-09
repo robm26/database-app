@@ -13,9 +13,9 @@ import favicon from "./components/favicon.ico";
 
 export const links = () => {
     return [
-        {rel:"stylesheet", href:stylesShared},
-        {rel: 'icon', type: 'image/png', sizes: '32x32', href: favicon},
-        {rel: 'icon', type: 'image/x-icon', href: favicon}
+        {rel: "stylesheet", href:stylesShared},
+        {key: 1, rel: 'icon', type: 'image/png', sizes: '32x32', href: favicon},
+        {key: 2, rel: 'icon', type: 'image/x-icon', href: favicon}
     ];
 };
 
