@@ -1,12 +1,4 @@
-const jobInformation = () => {
-    return {
-        description: 'This is the first job',
-        items: 5
-    };
-}
-
 const rowMaker = (tick, second) => {
-
     const newRow = {
         user_id: (3000 + tick).toString(),
         firstname: 'Luna',
@@ -15,8 +7,15 @@ const rowMaker = (tick, second) => {
         city: 'Wakefield',
         credit_rating: (tick * 10).toString()
     };
-
     return newRow;
+}
+
+const jobInformation = () => {
+    return {
+        jobType: 'load',
+        description: 'Load initial data',
+        items: 5
+    };
 }
 
 module.exports = { rowMaker, jobInformation };

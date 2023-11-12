@@ -2,8 +2,6 @@ import {
     useLoaderData, Link, Form, useFetcher, useActionData
 }  from "@remix-run/react";
 
-
-
 import React from 'react';
 
 import {Menu} from "~/components/menu";
@@ -80,7 +78,7 @@ export default function QueryIndex() {
     }
 
     let defaultSql = "select \n  *\n";
-    defaultSql += "from\n  users"
+    defaultSql += "from\n  customers"
     // defaultSql += "\nwhere\n  user_id = '1000' ";
 
     // defaultSql = "update users set credit_rating = 444 where user_id = '1000' ";

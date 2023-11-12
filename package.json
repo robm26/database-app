@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@aws-sdk/client-dynamodb": "^3.431.0",
+    "@aws-sdk/client-sts": "^3.449.0",
     "@aws-sdk/lib-dynamodb": "^3.438.0",
     "@remix-run/css-bundle": "^1.19.3",
     "@remix-run/node": "^1.19.3",

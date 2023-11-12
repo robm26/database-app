@@ -62,24 +62,36 @@
 
 }
 .jobList {
-    background-color: gainsboro;
+
     padding:5px;
-    border-radius:5px;
-}
-.jobList td {
-    border-bottom: 1px dashed green;
+
 }
 
 .jobList a {
     text-decoration:none;
     color: grey;
 }
+
 .jobList td {
-    padding:1px;
+    padding:5px;
+    border:none;
+
 }
 
-.jobList table {
-    padding:5px;
+.jobSelected {
+    background-color: lightgrey;
+    font-weight:bold;
+
+}
+.jobSelected a {
+    color: steelblue;
+}
+
+.jobDetailsTitle {
+    color: grey;
+    text-align:right;
+    font-size:smaller;
+
 }
 .errorPanel {
     background-color: LavenderBlush;
@@ -99,7 +111,7 @@
 .sqlTable th, td {
     padding:5px;
     margin:5px;
-    background-color: lightgrey;
+    background-color: gainsboro;
     color:dimgrey;
     border-bottom:1px solid gainsboro;
     border-right:1px solid gainsboro;
@@ -155,8 +167,6 @@
     margin:3px;
 }
 
-
-
 #jobForm button {
     border-radius:3px;
 }
@@ -186,4 +196,99 @@
     background-color: green;
     border: 1px solid gainsboro;
     border-radius: 5px;
+}
+
+.jobFormTableDiv {
+    background-color:gainsboro;
+    border-radius:6px;
+    padding:2px;
+    width: fit-content;
+
+}
+.jobFormTable {
+    border-radius: 15px;
+    border-collapse:collapse;
+}
+.jobFormTable td {
+    background-color:gainsboro;
+    padding:6px;
+
+    border:0px;
+    vertical-align:top;
+}
+
+
+.jobsBody {
+    vertical-align: top;
+}
+.jobsBody table {
+    border-collapse: collapse;
+
+}
+.jobsBody td {
+    border-radius:5px;
+    vertical-align: top;
+
+}
+.jobRoot {
+    background-color: gainsboro;
+}
+.viewCodeTextarea {
+    background-color: whitesmoke;
+}
+.previewRowsTable td {
+    background-color: whitesmoke;
+}
+
+.tdBlank {
+    background-color:whitesmoke;
+    border:none;
+}
+.setupBody td {
+    background-color: whitesmoke;
+    border:none;
+}
+
+.mysqlConnectionInfo td {
+    font-size: smaller;
+}
+.mysqlConnectionInfo td:nth-child(2) {
+    background-color:#EED;
+}
+
+.ddbConnectionInfo td {
+    font-size: smaller;
+}
+.ddbConnectionInfo td:nth-child(2) {
+    background-color:#DEE;
+}
+
+.mysqlTitle {
+
+    font-weight:bold;
+}
+.dynamodbTitle {
+
+    font-weight:bold;
+}
+.path {
+    font-family: monospace;
+    font-size:smaller;
+}
+.mysqlSetupButton {
+    font-weight:bold;
+    background-color:#EED;
+    border-radius:5px;
+}
+.ddbSetupButton {
+    font-weight:bold;
+    background-color:#DEE;
+    border-radius:5px;
+}
+
+.createOutput {
+
+    border-radius:5px;
+    padding:5px;
+    font-family: monospace;
 }
