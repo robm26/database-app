@@ -4,7 +4,7 @@ import React from "react";
 import * as fs from 'node:fs/promises';
 import { useActionData, useLoaderData, Form} from "@remix-run/react";
 import { STSClient, GetCallerIdentityCommand } from "@aws-sdk/client-sts";
-import { DynamoDBClient, DescribeEndpointsCommand } from "@aws-sdk/client-dynamodb";
+import { DynamoDBClient, DescribeEndpointsCommand, CreateTableCommand, DeleteTableCommand, ListTablesCommand} from "@aws-sdk/client-dynamodb";
 import { config } from "../components/mysql-credentials.mjs";
 import { runSql } from "../components/database.mjs";
 
@@ -17,12 +17,11 @@ export async function action({ params, request }) {
     const action = body.get("action");
 
     let status;
-    let counter = 0;
-
+    let errors = []
 
     if(action === 'mysqlCreate') {
         const mysqlSetupFiles = await fs.readdir('./setup/mysql');
-
+        let counter = 0;
         for (const file of mysqlSetupFiles) {
             let sql = 'DROP TABLE IF EXISTS ' + file + ';';
             let result = await runSql(sql);
@@ -31,18 +30,36 @@ export async function action({ params, request }) {
             result = await runSql(sql);
             counter += 1;
         }
-
-
         status = 'processed: ' + counter;
     }
 
     if(action === 'dynamodbCreate') {
+        const ddbClient = new DynamoDBClient({});
+
         const dynamodbAllFiles = await fs.readdir('./setup/dynamodb');
         const dynamodbSetupFiles = dynamodbAllFiles.filter(file => file.endsWith('.json'));
-        status = 'dynamodb good';
+        let counter = 0;
+        for (const file of dynamodbSetupFiles) {
+            const newTableJson = await fs.readFile('./setup/dynamodb/' + file, 'utf-8');
+            const ddbCommand = new CreateTableCommand(JSON.parse(newTableJson));
+
+            let ddbResponse;
+
+            try {
+                ddbResponse = await ddbClient.send(ddbCommand);
+            } catch (error) {
+                error['table'] = JSON.parse(newTableJson).TableName;
+                errors.push(error);
+            } finally {
+                counter += 1;
+            }
+
+        }
+
+        status = 'processed: ' + counter;
     }
 
-    return({action:action, status:status});
+    return({action:action, status:status, errors:errors});
 }
 
 export const loader = async ({ params, request }) => {
@@ -117,7 +134,7 @@ export default function Setup() {
                     </div>
                 </td></tr>
 
-                <tr><td className='tdBlank'>ee&nbsp;</td></tr>
+                <tr><td className='tdBlank'>&nbsp;</td></tr>
 
                 <tr>
                     <td rowSpan='3' className='dynamodbTitle'>DynamoDB</td>
@@ -142,7 +159,6 @@ export default function Setup() {
                             <tbody>
                                 <tr><td>Endpoint</td><td>{data.ddbResponse.Endpoints[0].Address}</td></tr>
                                 <tr><td>User</td><td>{data.stsResponse.UserId}<br/>({data.stsResponse.Arn})</td></tr>
-
                             </tbody>
                         </table>
                     </td>
@@ -152,7 +168,16 @@ export default function Setup() {
                         Create DynamoDB Tables</button>
                     &nbsp;&nbsp;
                     <div className='createOutput'>
-                        {actionData?.action === 'dynamodbCreate' ? actionData.status: null}
+                        {actionData?.action === 'dynamodbCreate' ? (
+                            <div>
+                                {actionData.errors.map((err, index) => {
+                                    return (<div key={index}>
+                                        HTTP {err.$metadata.httpStatusCode} {err.name} {err.table}<br/>
+                                    </div>);
+                                })}
+                                {actionData.status}
+                            </div>
+                        ): null}
                     </div>
                 </td></tr>
 

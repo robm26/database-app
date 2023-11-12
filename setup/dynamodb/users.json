@@ -1,8 +1,0 @@
-{ "TableName": "users",
-  "Tags": [{"Key": "table_name", "Value": "users"}],
-  "BillingMode": "PAY_PER_REQUEST",
-  "AttributeDefinitions": [
-      {"AttributeName": "user_id", "AttributeType": "S"}
-    ],
-   "KeySchema": [{"KeyType": "HASH", "AttributeName": "user_id"}]
-}

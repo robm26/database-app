@@ -1,0 +1,7 @@
+{ "TableName": "customers",
+  "BillingMode": "PAY_PER_REQUEST",
+  "AttributeDefinitions": [
+      {"AttributeName": "cust_id", "AttributeType": "S"}
+    ],
+   "KeySchema": [{"KeyType": "HASH", "AttributeName": "cust_id"}]
+}

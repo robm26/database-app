@@ -4,12 +4,21 @@ ENDPOINTURL=https://dynamodb.$REGION.amazonaws.com
 
 OUTPUT=text
 
+TableList=("customers" "products" )
+TableName=""
+
 if [ $# -gt 0 ]
   then
+    TableName=$1
     aws dynamodb delete-table --table-name $1 --region $REGION --endpoint-url $ENDPOINTURL --output $OUTPUT --query 'TableDescription.TableArn'
   else
-     aws dynamodb delete-table --table-name table1 --region $REGION --endpoint-url $ENDPOINTURL --output $OUTPUT --query 'TableDescription.TableArn'
-     aws dynamodb delete-table --table-name table2 --region $REGION --endpoint-url $ENDPOINTURL --output $OUTPUT --query 'TableDescription.TableArn'
-     aws dynamodb delete-table --table-name table3 --region $REGION --endpoint-url $ENDPOINTURL --output $OUTPUT --query 'TableDescription.TableArn'
-
+    for TableName in "${TableList[@]}"
+    do
+          aws dynamodb delete-table --table-name $TableName --region $REGION --endpoint-url $ENDPOINTURL --output $OUTPUT --query 'TableDescription.TableArn'
+    done
 fi
+
+echo Table deletion in process, please wait...
+# await final table deletion
+aws dynamodb wait table-not-exists --table-name $TableName --region $REGION --endpoint-url $ENDPOINTURL
+
