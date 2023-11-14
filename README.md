@@ -1,5 +1,5 @@
 # database-app
-Web application for testing and comparing data access patterns with DynamoDB and MySQL 
+A web application for testing and comparing data access patterns with DynamoDB and MySQL. 
 
 DynamoDB offers fast, predictable latency and unlimited scale via an API interface.
 
@@ -20,11 +20,12 @@ compare and contrast the features and performance of each database service.
 
 ## Features 
 A query editor and job system will allow you to perform very similar access patterns to each database. 
-With DynamoDB you can use PartiQL, a query language that is similar to SQL.
+With DynamoDB you can use [PartiQL](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/ql-reference.html), a query language that is similar to SQL.
 
 A job system allows users to create simple scripts that generate sample records. 
+The jobs are stored in the folder [/jobs](./jobs). 
 Each sample record is created by a function called *rowMaker* that accepts a tick, or iteration number. 
-The job execution function will then loop through and call rowMaker with the loop counter to generate a unique item.
+The [job execution function](./app/components/jobExec.mjs) will then loop through and call rowMaker with the loop counter to generate a unique item.
 
 
 ## Setup 
@@ -38,15 +39,15 @@ The web app itself has no login page, and is intended for personal and education
  * AWS account
  * AWS CLI setup with IAM identity with programmatic access
  * Node JS
- * Existing MySQL database that is accessible, knowing the hostname, username, password. Create a database called **database-app**.
+ * An existing MySQL database that is accessible, knowing the hostname, username, password. Create a database called **database-app**.
 
 ### Steps
 You can deploy this to your laptop 
 1. git clone this repository 
 2. cd into the folder ```database-app```
 3. run ```npm install```
-4. Update the MySQL connection settings in ```/app/components/mysql-credentials.mjs```
-5. Run ```npm run dev```
+4. Update the MySQL connection settings in [/app/components/mysql-credentials.mjs](./app/components/mysql-credentials.mjs)
+5. Run ```npm run dev``` and ensure there are no errors. This runs [remix-serve](https://remix.run/docs/en/main/other-api/serve), a mini Express web server 
 6. Open a browser and navigate to ```http://localhost:3000```  
 7. If you are in Cloud9, instead click the Preview button on the top bar (next to the Run button) and then click Preview Running Application.
 The web app loads in the bottom right corner. You can un-dock this browser into a full-screen experience via the arrow link button on the right side.
