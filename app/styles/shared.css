@@ -33,12 +33,28 @@
     padding: 16px;
 
 }
+.menuHourglass {
+    display: block;
+    color: dimgrey;
+    text-align: center;
+    padding: 10px;
+    text-decoration: none;
+    animation: rotation 4s infinite linear;
+
+}
+
+@keyframes rotation {
+    from {transform: rotate(0deg);}
+    to {transform: rotate(359deg);}
+}
+
 .menuLink {
     display: block;
     color: dimgrey;
     text-align: center;
     padding: 16px;
     text-decoration: none;
+
 }
 .menuLinkSelected {
     display: block;
@@ -129,7 +145,7 @@
 }
 
 .sqlTable [highlight='highlight'] {
-    border:2px solid red;
+    border:2px solid crimson;
 
 }
 
@@ -275,6 +291,12 @@
     font-family: monospace;
     font-size:smaller;
 }
+.path:hover {
+    color:black;
+    border: 2px solid red;
+    border-radius:5px;
+
+}
 .mysqlSetupButton {
     font-weight:bold;
     background-color:#EED;
@@ -291,4 +313,10 @@
     border-radius:5px;
     padding:5px;
     font-family: monospace;
+}
+
+.resultDisplayTable  td, th {
+    padding:6px;
+    border-radius: 0px;
+    background-color: #bcd;
 }

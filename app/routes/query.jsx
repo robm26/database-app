@@ -1,5 +1,5 @@
 import {
-    useLoaderData, Link, Form, useFetcher, useActionData
+    Link, Form, useActionData, useNavigation
 }  from "@remix-run/react";
 
 import React from 'react';
@@ -42,6 +42,7 @@ export const loader = async ({ params, request }) => {
 export default function QueryIndex() {
 //     const data = useLoaderData();
     const actionData = useActionData();
+    const navigation = useNavigation();
     let result = actionData?.result;
     let affectedRows = result?.affectedRows;
 
@@ -84,10 +85,6 @@ export default function QueryIndex() {
     // defaultSql = "update users set credit_rating = 444 where user_id = '1000' ";
 
 
-    const chartPanel = (<div className='chartPanel'>
-        &lt; Latency chart, MySQL vs DynamoDB &gt;
-    </div>);
-
     const sqlForm = (<Form id="jobForm" method="post"  >
         <div className='sqlTableDiv'>
         <table className='sqlTableForm'>
@@ -128,8 +125,6 @@ export default function QueryIndex() {
 
             <div className='sqlContainer'>
                 {sqlForm}
-
-                {actionData?.latency ? chartPanel : null}
                 <br/>
                 {result?.error && result.error.name !== 'ConditionalCheckFailedException' ?
                     (<div className='errorPanel'>

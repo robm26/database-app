@@ -6,7 +6,7 @@ import React from 'react';
 import * as fs from 'node:fs/promises';
 
 export const loader = async ({ params, request }) => {
-    const jobFiles = await fs.readdir('./app/components/jobs');
+    const jobFiles = await fs.readdir('./jobs');
 
     return {
         jobFiles: jobFiles,

@@ -1,18 +1,11 @@
-import {
-    Link,
-    useLoaderData
-} from "@remix-run/react";
-
-import { useState } from "react";
-
-// import React, { useState } from 'react';
+import {Link, useNavigation} from "@remix-run/react";
 
 import {config} from "~/configuration";
 
-
 export function Menu(params) {
-    const data = useLoaderData();
-    // const transition = useTransition();
+    const navigation = useNavigation();
+    // ⏳
+
     let menuItemList = config().menuitems;
 
     const topLinks = (
@@ -20,6 +13,13 @@ export function Menu(params) {
             <li key="0"  >
                 <Link to="/" className='titleLink'>database-app</Link>
             </li>
+            <li >
+                <div className='menuHourglass'>
+                    {['submitting', 'loading'].includes(navigation.state) ? "⏳" :  (<>&nbsp;&nbsp;&nbsp;&nbsp;</>)}
+                </div>
+
+            </li>
+
             {menuItemList.map((x,i) => {
                 const menuLinkClass = params?.page === x ? 'menuLinkSelected' : 'menuLink';
 

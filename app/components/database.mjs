@@ -7,6 +7,7 @@ import {ExecuteStatementCommand, DynamoDBDocumentClient} from "@aws-sdk/lib-dyna
 const client = new DynamoDBClient({});
 const docClient = DynamoDBDocumentClient.from(client);
 
+
 const runPartiQL = async (sql) => {
 
     let latency = 0;
@@ -43,6 +44,9 @@ const runPartiQL = async (sql) => {
             },
             affectedRows: 0
         };
+        console.log(sql);
+
+        console.log(JSON.stringify(error, null, 2));
 
         return({result:errorSummary, latency:latency, operation: operation});
     }

@@ -23,7 +23,7 @@ export async function action({ params, request }) {
         const mysqlSetupFiles = await fs.readdir('./setup/mysql');
         let counter = 0;
         for (const file of mysqlSetupFiles) {
-            let sql = 'DROP TABLE IF EXISTS ' + file + ';';
+            let sql = 'DROP TABLE IF EXISTS ' + file.slice(0, -4) + ';';
             let result = await runSql(sql);
 
             sql = await fs.readFile('./setup/mysql/' + file, 'utf-8');
@@ -102,7 +102,9 @@ export default function Setup() {
                     <td>Create Table Commands<br/>
                         <span className='path'>database_app/setup/mysql/</span>
                     </td>
-                    <td>Connection Details</td>
+                    <td>Connection Details<br/>
+                    <span className='path'>/app/components/mysql-credentials.mjs</span>
+                    </td>
                 </tr>
                 <tr><td>
                     <table className='jobList'>
@@ -117,7 +119,7 @@ export default function Setup() {
                 <td>
                     <table className='mysqlConnectionInfo'>
                         <tbody>
-                        <tr><td>Host</td><td>{config.host}</td></tr>
+                        <tr><td>Host</td><td className='path'>{config.host}</td></tr>
                         <tr><td>User</td><td>{config.user}</td></tr>
                         <tr><td>Database</td><td>{config.database}</td></tr>
 
@@ -141,7 +143,8 @@ export default function Setup() {
                     <td>New Table Definitions<br/>
                     <span className='path'>database_app/setup/dynamodb/</span>
                     </td>
-                    <td>Connection Details</td>
+                    <td>Connection Details<br/>
+                        <span className='path'>IAM Identity set in shell environment</span></td>
                 </tr><tr>
                     <td>
                         <table className='jobList'>
@@ -157,7 +160,7 @@ export default function Setup() {
                     <td>
                         <table className='ddbConnectionInfo'>
                             <tbody>
-                                <tr><td>Endpoint</td><td>{data.ddbResponse.Endpoints[0].Address}</td></tr>
+                                <tr><td>Endpoint</td><td className='path'>{data.ddbResponse.Endpoints[0].Address}</td></tr>
                                 <tr><td>User</td><td>{data.stsResponse.UserId}<br/>({data.stsResponse.Arn})</td></tr>
                             </tbody>
                         </table>
