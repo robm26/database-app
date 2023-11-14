@@ -36,9 +36,9 @@ export async function action({ params, request }) {
 
         const params = {
             experiment: 'Exp1',
-            test: 'MySQL Load Ten',
+            test: jobInfo.description,
             dbEngine: dbEngine,
-            targetTable: 'customers',
+            targetTable: jobInfo.targetTable,
             jobFile: jobFileNameImport
         };
 

@@ -17,7 +17,7 @@ const jobInformation = () => {
         jobType: 'insert',
         targetTable: 'customers',
         description: 'Load initial data',
-        items: 3
+        items: 5
     };
 }
 
