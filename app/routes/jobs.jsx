@@ -27,7 +27,7 @@ export default function Jobs(params) {
     const currentJobName = pathname.split('/')[2];
 
     return(
-        <div className="rootContainer">
+        <div className="jobsContainer">
             <Menu page='jobs' />
 
             <table className='jobsBody'>

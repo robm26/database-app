@@ -21,28 +21,59 @@ const runJob = async (params) => {
     const test = params['test'];
     const dbEngine = params['dbEngine'];
     const targetTable = params['targetTable'];
+    const PK = params['PK'];
+    let PkValue;
     const jobFileNameImport = pathToJobsFolder + params['jobFile'];
 
     const job = await import(jobFileNameImport);
     const jobInfo = job.jobInformation();
     const jobResults = [];
+    let nowMs;
+    let nowSec;
+    const startMs = Date.now();
+    const startSec = Math.floor(startMs/1000);
+    let jobSecond = 0;
 
     if(jobInfo.jobType.toUpperCase() === 'INSERT') {
         for(let rowNum = 1; rowNum <= jobInfo.items; rowNum++){
-            const row = job.rowMaker(rowNum);
 
+            nowMs = Date.now();
+            nowSec = Math.floor(nowMs/1000);
+            jobSecond = nowSec - startSec;
+
+            const row = job.rowMaker(rowNum);  // ***** crux of the job system
+
+
+            let rowResult;
             if(dbEngine === 'mysql') {
                 const sql = 'INSERT INTO ' + targetTable + ' (' + Object.keys(row).join(",") + ') '
                     + 'VALUES (' + Object.values(row).map(val=> "'" + val + "'").join(",") + ');';
-                const rowResult = await runSql(sql);
-                jobResults.push(rowResult);
+                rowResult = await runSql(sql);
+
             }
             if(dbEngine === 'dynamodb') {
                 const pqlDoubleQuotes = "INSERT INTO " + targetTable + " VALUE " + JSON.stringify(row) + ";";
                 const pql = pqlDoubleQuotes.replaceAll('"', "'");
-                const rowResult = await runPartiQL(pql);
-                jobResults.push(rowResult);
+                rowResult = await runPartiQL(pql);
+
             }
+            // console.log(JSON.stringify(rowResult, null, 2));
+            let rowSummary = {
+                rowNum: rowNum,
+                dbEngine: dbEngine,
+                experiment: experiment,
+                test: test,
+                operation: rowResult.operation,
+                targetTable:targetTable,
+                PK: PK,
+                jobSecond: jobSecond,
+                latency: rowResult.latency,
+                httpStatusCode: rowResult?.result?.$metadata?.httpStatusCode,
+                attempts: rowResult?.result?.$metadata?.attempts,
+                ConsumedCapacity: rowResult?.result?.ConsumedCapacity?.CapacityUnits
+            };
+            // rowResult enrichment
+            jobResults.push(rowSummary);
 
         }
     }

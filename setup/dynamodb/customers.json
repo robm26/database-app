@@ -1,7 +1,10 @@
 { "TableName": "customers",
   "BillingMode": "PAY_PER_REQUEST",
   "AttributeDefinitions": [
-      {"AttributeName": "cust_id", "AttributeType": "S"}
+      {"AttributeName": "cust_id", "AttributeType": "S"},
+      {"AttributeName": "contact", "AttributeType": "S"}
     ],
-   "KeySchema": [{"KeyType": "HASH", "AttributeName": "cust_id"}]
+   "KeySchema": [
+     {"KeyType": "HASH", "AttributeName": "cust_id"},
+     {"KeyType": "RANGE", "AttributeName": "contact"}]
 }

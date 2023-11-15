@@ -4,24 +4,36 @@ import React from "react";
 import {useActionData, useLoaderData, Form, useNavigation} from "@remix-run/react";
 import * as fs from 'node:fs/promises';
 
+import {SqlGrid} from "~/components/SqlGrid";
 import {runJob} from "../components/jobExec.mjs";
 
-const previewMax = 5;
+const previewMax = 10;
 
 export async function action({ params, request }) {
+    // const randSuffix = randomString(4);
 
     const jobFileNameImport = '../jobs/' + params['job'] + '.js';
+    const jobFileName = './jobs/' + params['job'] + '.js';
 
     const job = await import(jobFileNameImport);
+
     const jobInfo = job.jobInformation();
 
     const body = await request.formData();
     const _action = body.get("_action");
     let returned = {_action: _action};
+
+    // returned['randSuffix'] = randSuffix;
+
     let previewRows = [];
     let outputRows = [];
 
-    if(_action === 'preview') {
+    if(_action.slice(0,4) === 'code') {
+        const jobCode = await fs.readFile( jobFileName, 'utf-8');
+        returned['code'] = jobCode;
+    }
+
+    if(_action.slice(0,7) === 'preview') {
         for(let rowNum = 1; rowNum <= jobInfo.items; rowNum++){
             previewRows.push(job.rowMaker(rowNum));
             if(rowNum === previewMax) {
@@ -29,9 +41,12 @@ export async function action({ params, request }) {
             }
         }
         returned['previewRows'] = previewRows;
+        returned['code'] = null;
     }
 
     if(_action.slice(0, 3) === 'run') {
+        returned['code'] = null;
+
         const dbEngine = _action.slice(4);
 
         const params = {
@@ -67,6 +82,7 @@ export default function Job(params) {
     const data = useLoaderData();
     const actionData = useActionData();
     const navigation = useNavigation();
+    // const randSuffix = actionData?.randSuffix;
 
     const jobForm = (
         <Form id="jobForm" method="post"  >
@@ -85,9 +101,14 @@ export default function Job(params) {
                     </td><td colSpan='3'>
                         {data.info.description}
                     </td></tr>
+                    <tr><td className='jobDetailsTitle'>
+                        Item count
+                    </td><td colSpan='3'>
+                        {data.info.items}
+                    </td></tr>
 
                     <tr><td></td><td colSpan='3'>
-                            <button type='submit' name='_action' value='code'>View Code</button>
+                            <button type='submit' name='_action' value={'code' + Math.random().toString()} >View Code</button>
                             &nbsp;&nbsp;
                             <button type='submit' name='_action' value='preview'>Preview</button>
                             &nbsp;&nbsp;
@@ -109,36 +130,60 @@ export default function Job(params) {
     );
 
     const previewRowsTable = (
-        <table className='previewRowsTable'>
-            <tbody>
-            {!actionData?.previewRows ? [] : actionData?.previewRows.map((row, index) => (
-                <tr key={index}>
-                    <td>{index}</td>
-                    <td>{JSON.stringify(row)}</td>
-                </tr>
-            ))}
-            </tbody>
-        </table>
+        <SqlGrid data={actionData?.previewRows} />
     );
 
-    const viewCode = (
+    const viewCode = !actionData?.code ? null : (
         <textarea disabled name='sqlInput' id='sqlInput'
-                  className='viewCodeTextarea' rows='10' cols='80'
-                  defaultValue={data.jobFile}>
-
+                  className='viewCodeTextarea' rows='20' cols='80'
+                  defaultValue={actionData?.code}>
                 </textarea>
     );
+    const jobResultColumnList = ['rowNum','dbEngine','targetTable', 'operation', 'jobSecond',
+        'latency','experiment','test','httpStatusCode', 'attempts','ConsumedCapacity'];
+
+
+    const itemsProcessed = actionData?.jobResultsRaw?.length;
+    const totalLatency = actionData?.jobResultsRaw?.reduce((acc, curr) => acc + curr.latency, 0);
+    const averageLatency = Math.floor(totalLatency / itemsProcessed);
+    // const totalDuration = actionData?.jobResultsRaw[actionData?.jobResultsRaw?.length-1]['jobSecond'];
+    // const averageVelocity = (itemsProcessed / totalDuration).toFixed(1);
+
     const viewResults = !actionData?.jobResultsRaw ? null : (
         <div>
+            Job Results:
+            <table className='jobResultsSummaryTable'>
+                <thead><tr><th colSpan='2'>Job Summary</th></tr></thead>
+                <tbody>
+
+                    <tr><td>Engine</td><td>{actionData?.jobResultsRaw[0]?.dbEngine}</td></tr>
+                    <tr><td>Items Processed</td><td>{itemsProcessed}</td></tr>
+                    {/*<tr><td>Total Duration (sec)</td><td>{totalDuration}</td></tr>*/}
+                    {/*<tr><td>Average Velocity (items/sec)</td><td>{averageVelocity}</td></tr>*/}
+                    <tr><td>Average request Latency (ms)</td><td>{averageLatency}</td></tr>
+                </tbody>
+            </table>
+            <br/>
+
             <table className='resultDisplayTable'>
                 <thead>
-                <tr><th>Operation</th><th>Latency</th></tr>
+
+                <tr>
+                    {jobResultColumnList.map((col, index) => {
+                        return (<th>{col}</th>);
+                    })}
+                </tr>
                 </thead><tbody>
 
             {actionData.jobResultsRaw.map((result, index)=>{
                 return(
-                    <tr key={index}><td>{result.operation}</td>
-                        <td>{result.latency}</td></tr>
+                    <tr key={index}>
+                        {jobResultColumnList.map((col, index) => {
+
+                            return (<td>{result[col]}</td>);
+                        })}
+
+                    </tr>
                 );
             })}
             </tbody></table>
@@ -146,14 +191,15 @@ export default function Job(params) {
     );
 
     return(
-
-        <div className="jobRoot">
-                <div> {jobForm}</div>
-
-                <br/>
-                {actionData?._action === 'code' ? viewCode: null}
-                {actionData?._action === 'preview' ? previewRowsTable: null}
+        <div>
+            <div > {jobForm}</div>
+            <br/>
+            {viewCode}
+            <div className="jobResultsTable">
+                {previewRowsTable}
                 {viewResults}
+            </div>
+
 
         </div>
     );

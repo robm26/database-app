@@ -5,10 +5,11 @@ const run = async () => {
 
     const params = {
         experiment: 'Exp1',
-        test: 'MySQL Load Ten',
+        test: 'Products',
         dbEngine: 'dynamodb',
-        targetTable: 'customers',
-        jobFile: 'job1.js'
+        targetTable: 'products',
+        PK: 'prod_id',
+        jobFile: 'load-products.js'
     };
 
     const results = await runJob(params);
