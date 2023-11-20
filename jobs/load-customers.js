@@ -18,6 +18,7 @@ const jobInformation = () => {
     return {
         jobType: 'insert',
         targetTable: 'customers',
+        PK: 'cust_id',
         description: 'Load initial customer data',
         items: 20
     };

@@ -11,9 +11,10 @@ const previewMax = 10;
 
 export async function action({ params, request }) {
     // const randSuffix = randomString(4);
+    const jobId = params['job'];
 
-    const jobFileNameImport = '../jobs/' + params['job'] + '.js';
-    const jobFileName = './jobs/' + params['job'] + '.js';
+    const jobFileNameImport = '../jobs/' + jobId + '.js';
+    const jobFileName = './jobs/' + jobId + '.js';
 
     const job = await import(jobFileNameImport);
 
@@ -21,6 +22,9 @@ export async function action({ params, request }) {
 
     const body = await request.formData();
     const _action = body.get("_action");
+    const experiment = body.get("experiment");
+    const test = body.get("test");
+
     let returned = {_action: _action};
 
     // returned['randSuffix'] = randSuffix;
@@ -50,14 +54,17 @@ export async function action({ params, request }) {
         const dbEngine = _action.slice(4);
 
         const params = {
-            experiment: 'Exp1',
-            test: jobInfo.description,
+            experiment: experiment,
+            test: test,
+            job:jobId,
             dbEngine: dbEngine,
+            PK:jobInfo.PK,
             targetTable: jobInfo.targetTable,
             jobFile: jobFileNameImport
         };
 
         const results = await runJob(params);
+
         returned['jobResultsRaw'] = results;
     }
 
@@ -106,6 +113,14 @@ export default function Job(params) {
                     </td><td colSpan='3'>
                         {data.info.items}
                     </td></tr>
+                    <tr><td className='jobDetailsTitle'>Experiment</td><td>
+                        <input type='text' name='experiment' id='experiment' className='jobInputs'
+                               defaultValue={actionData?.experiment || 'Experiment 1'} />
+                    </td></tr>
+                    <tr><td className='jobDetailsTitle'>Test</td><td>
+                        <input type='text' name='test' id='test' className='jobInputs'
+                               defaultValue={actionData?.test || 'Test 1'} />
+                    </td></tr>
 
                     <tr><td></td><td colSpan='3'>
                             <button type='submit' name='_action' value={'code' + Math.random().toString()} >View Code</button>
@@ -139,7 +154,7 @@ export default function Job(params) {
                   defaultValue={actionData?.code}>
                 </textarea>
     );
-    const jobResultColumnList = ['rowNum','dbEngine','targetTable', 'operation', 'jobSecond',
+    const jobResultColumnList = ['rowNum','dbEngine','targetTable', 'PK', 'operation', 'jobSecond',
         'latency','experiment','test','httpStatusCode', 'attempts','ConsumedCapacity'];
 
 
@@ -176,6 +191,7 @@ export default function Job(params) {
                 </thead><tbody>
 
             {actionData.jobResultsRaw.map((result, index)=>{
+
                 return(
                     <tr key={index}>
                         {jobResultColumnList.map((col, index) => {

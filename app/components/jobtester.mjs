@@ -1,10 +1,9 @@
 import {runJob} from "./jobExec.mjs";
 
-
 const run = async () => {
 
     const params = {
-        experiment: 'Exp1',
+        experiment: 'Exp7',
         test: 'Products',
         dbEngine: 'dynamodb',
         targetTable: 'products',

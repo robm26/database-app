@@ -1,4 +1,10 @@
 import {runSql, runPartiQL} from "./database.mjs";
+import {getData} from './cloudwatch.mjs'
+
+const cwData = getData({TableName:'products'});
+console.log('cwData');
+
+// console.log(JSON.stringify(cwData, null, 2));
 
 let sql;
 
@@ -9,8 +15,8 @@ sql = "select * from customers ";
 // sql = "  update users set credit_rating = 337 where user_id = '1000' ";
 // sql = "DROP TABLE IF EXISTS customers;";
 
-console.log(sql);
-console.log(Math.random());
+// console.log(sql);
+// console.log(Math.random());
 
 let db = 'dynamodb';
 
@@ -29,7 +35,7 @@ const run = async (sql) => {
         result = await runSql(sql);
     }
 
-    console.log(JSON.stringify(result, null, 2));
+    // console.log(JSON.stringify(result, null, 2));
 
 }
 

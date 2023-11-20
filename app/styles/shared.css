@@ -81,11 +81,7 @@
     width: 500px;
 
 }
-.jobList {
 
-    padding:5px;
-
-}
 
 .jobList a {
     text-decoration:none;
@@ -223,7 +219,7 @@
 .jobFormTableDiv {
     background-color:gainsboro;
     border-radius:6px;
-    padding:2px;
+    padding:5px;
     width: fit-content;
 
 }
@@ -245,18 +241,18 @@
 }
 .jobsBody table {
     border-collapse: collapse;
-
 }
 .jobsBody td {
-
     vertical-align: top;
-
 }
 .jobRoot {
     background-color: gainsboro;
 }
 .viewCodeTextarea {
     background-color: whitesmoke;
+    white-space: pre;
+    overflow-wrap: normal;
+    overflow-x: scroll;
 }
 .previewRowsTable td {
     background-color: whitesmoke;
@@ -348,4 +344,46 @@
     color:Brown;
     font-size:larger;
     padding:5px;
+}
+.jobInputs {
+    border:none;
+    padding:3px;
+    border-radius:3px;
+    background-color:FloralWhite;
+}
+.clearExperimentsButton {
+    font-size:smaller;
+    color:grey;
+    background-color:silver;
+    border:none;
+    border-radius:5px;
+}
+.jobsWelcome {
+    padding:10px;
+    border-radius:5px;
+    background-color:lightgrey;
+    margin-left:10px;
+    color:dimgray;
+}
+.jobsWelcome span {
+    font-size:larger;
+    font-weight:bold;
+}
+.jobsWelcome a {
+    color:dimgrey;
+}
+.downloadDiv {
+
+    font-size:smaller;
+}
+.downloadDiv a {
+    color:dimgray;
+}
+.expListTd {
+
+    border-left:5px solid whitesmoke;
+}
+.chartDiv {
+    width:600px;
+    height:500px;
 }

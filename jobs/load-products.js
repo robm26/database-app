@@ -14,11 +14,11 @@ const rowMaker = (tick, second) => {
     return newRow;
 }
 
-
 const jobInformation = () => {
     return {
         jobType: 'insert',
         targetTable: 'products',
+        PK: 'prod_id',
         description: 'Load initial product data',
         items: 100
     };
