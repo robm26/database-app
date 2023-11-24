@@ -1,10 +1,14 @@
 import React from "react";
 import {
-    useLoaderData, Link, Outlet, useLocation, Form, useFetcher, useActionData
+    useLoaderData, Form
 }  from "@remix-run/react";
 
 import * as fs from 'node:fs/promises';
 import { ClientOnly } from 'remix-utils';
+
+
+import {ChartMaker} from "~/components/chartMaker";
+
 
 import {
     Chart as ChartJS,
@@ -16,6 +20,7 @@ import {
     Tooltip,
     Legend,
 } from 'chart.js/auto';
+
 import { Line } from 'react-chartjs-2';
 
 import {csv} from 'csvtojson';
@@ -33,61 +38,40 @@ ChartJS.register(
     Legend
 );
 
+
+
 export const loader = async ({ params, request }) => {
+
     const fileData = await fs.readFile( experimentResultsRoot + '/' +  params.experiment + '/data.csv', 'utf-8');
     const fileDataObj = await csv().fromString(fileData);
 
-    const engines  = Array.from(new Set(fileDataObj.map((line) => line?.dbEngine)));
-    const tests  = new Set(fileDataObj.map((line) => line?.test));
-    const jobFiles  = new Set(fileDataObj.map((line) => line?.jobFile));
-    const targetTable  = new Set(fileDataObj.map((line) => line?.targetTable));
+    let allChartParams = [];
 
-    let setSize = 0;
-    const dataSets = engines.map((engine, index) => {
-
-        let myDataSet = fileDataObj.filter((row) => {
-            return row?.dbEngine === engine;
-        });
-
-        setSize = myDataSet.length > setSize ? myDataSet.length : setSize;
-
-        return {
-            label: engine,
-            data: myDataSet.map((row) => row?.latency),
-            borderColor: getBrushColor({dbEngine:engine}),
-            backgroundColor: getBrushColor({dbEngine:engine})
-        };
-    });
-
-    const setSizeArray = Array.from({length: setSize}, (_, i) => i + 1);
-    const labels = setSizeArray;
-
-    const options = {
-        responsive: true,
-        plugins: {
-            legend: {position: 'top'},
-            title: {display: true, text: 'Latency (ms) vs DB engine for ' + setSize + ' iterations'},
-        },
-
-        scales: {
-            y: {
-                ticks: {
-                    // Include a dollar sign in the ticks
-                    callback: (label) => label + ' ms',
-                }
-            }
-        }
+    const chartParams1 = {
+        fileDataObj: fileDataObj,
+        compare: 'dbEngine',
+        measure: 'latency',
+        yAgg: 'actual',
+        xAxis: 'rowNum',
+        chartType: 'Line'
     };
 
-    const resultsData = {
-        labels,
-        datasets: dataSets
+    const chartParams2 = {
+        fileDataObj: fileDataObj,
+        compare: 'dbEngine',
+        measure: 'jobTimestampMs',
+        yAgg: 'actual',
+        xAxis: 'rowNum',
+        chartType: 'Line'
     };
+
+    allChartParams.push(chartParams1);
+    // allChartParams.push(chartParams2);
+
 
     return {
         fileData:fileData,
-        options:options,
-        resultsData:resultsData,
+        allChartParams: allChartParams,
         params: params
     };
 };
@@ -99,33 +83,31 @@ export async function action({ params, request }) {
 
 export default function Experiment() {
     const data = useLoaderData();
-    const actionData = useActionData();
     const experiment = data.params.experiment;
 
     const dataPreviewRaw = data.fileData.slice(0, 1000);
     const dataPreview = dataPreviewRaw.slice(0, dataPreviewRaw.lastIndexOf('\n'));
 
-    const myChart = (
-
-        <ClientOnly fallback={<Fallback />}>
-            {() => <Line options={data.options} data={data.resultsData} />}
-        </ClientOnly>
-
-    );
-
 
     const experimentForm = (
         <Form id="experimentForm" method="post"  >
             <div className='jobFormTableDiv'>
-                <br/>
-                <div className='chartDiv' >
-                    {myChart}
-                </div>
+                {
+                    data.allChartParams.map((chart, index) => {
 
-                <br/>
+                        return (<div className='chartDiv' key={index}>
+                            <ClientOnly fallback={<Fallback />}>
+                                {() => {return (<ChartMaker params={data.allChartParams[index]} />)}
+                                }
+                            </ClientOnly>
+                            <hr/>
+
+                        </div>);
+                    })
+                }
+
                 <br/>
                 <div>
-
                     <div className={'downloadDiv'}>
                         <b>data.csv :</b>
                         &nbsp;&nbsp;
@@ -139,12 +121,10 @@ export default function Experiment() {
                     </div>
                     <br/>
                     <details>
-                        <summary>Preview Data</summary>
+                        <summary>Data sample</summary>
                         <textarea rows='10' cols='80' className='viewCodeTextarea' defaultValue={dataPreview} ></textarea>
                     </details>
-
                 </div>
-
             </div>
         </Form>
     );

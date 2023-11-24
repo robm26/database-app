@@ -47,6 +47,7 @@ export default function QueryIndex() {
     let affectedRows = result?.affectedRows;
 
     let operation = actionData?.operation;
+    let consumedCapacity = actionData?.result?.ConsumedCapacity?.CapacityUnits;
 
     let stmt = '';
 
@@ -84,7 +85,6 @@ export default function QueryIndex() {
 
     // defaultSql = "update users set credit_rating = 444 where user_id = '1000' ";
 
-
     const sqlForm = (<Form id="jobForm" method="post"  >
         <div className='sqlTableDiv'>
         <table className='sqlTableForm'>
@@ -112,9 +112,13 @@ export default function QueryIndex() {
                 {actionData?.latency ? actionData?.latency + ' ms' : ''}
                 &nbsp; &nbsp;
                 {rowCount !== undefined ? (<span>rows: {rowCount}</span>) : null}
-                <br/>
+                &nbsp; &nbsp;
 
-            </td></tr></tbody>
+                {!consumedCapacity ?
+                    null :
+                    (<span>{consumedCapacity} {operation === 'select' ? 'RCU' : 'WCU'} &nbsp;</span>)}
+
+                    </td></tr></tbody>
         </table>
         </div>
     </Form>);

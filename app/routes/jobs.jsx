@@ -75,6 +75,7 @@ export default function Jobs(params) {
             <table className='jobsBody'>
                     <tbody>
                     <tr><td>
+
                         <table className='jobList'>
                                 <tbody>
                                 {data.jobFiles.map((job,index) => {
@@ -89,7 +90,9 @@ export default function Jobs(params) {
                                 </tbody>
                             </table>
                     </td>
-                        {currentJobName ? <td><Outlet /></td> : welcomeMsg}
+
+                        <td>{currentJobName ? <Outlet/> : welcomeMsg}</td>
+
                     </tr>
                     </tbody>
                 </table>

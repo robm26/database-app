@@ -35,7 +35,7 @@ const run = async (sql) => {
         result = await runSql(sql);
     }
 
-    // console.log(JSON.stringify(result, null, 2));
+    console.log(JSON.stringify(result, null, 2));
 
 }
 

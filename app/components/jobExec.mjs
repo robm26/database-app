@@ -36,9 +36,20 @@ const runJob = async (params) => {
     const jobResults = [];
     let nowMs;
     let nowSec;
-    const startMs = Date.now();
-    const startSec = Math.floor(startMs/1000);
+    const sleep = ms => new Promise(r => setTimeout(r, ms));
+
     let jobSecond = 0;
+    let jobTimestamp = 0;
+    let jobTimestampMs = 0;
+    let jobElapsed = 0;
+
+    let startMs = Date.now();
+    const startSec = Math.floor(startMs/1000);
+    const msUntilNextSec = 1000 - (startMs - (startSec * 1000));
+
+    await sleep(msUntilNextSec);
+
+    startMs = Date.now();
 
     if(jobInfo.jobType.toUpperCase() === 'INSERT') {
         const rowLimit = 100000000;
@@ -46,8 +57,12 @@ const runJob = async (params) => {
 
         for(let rowNum = 1; rowNum <= loopLimit; rowNum++){
 
-            nowMs = Date.now();
-            nowSec = Math.floor(nowMs/1000);
+            const nowNow = Date.now();
+            jobTimestamp = Math.floor(nowNow/1000);
+            jobTimestampMs = nowNow - (jobTimestamp * 1000);
+            jobElapsed = nowNow - startMs;
+
+            nowSec = Math.floor(nowNow/1000);
             jobSecond = nowSec - startSec;
 
             const row = job.rowMaker(rowNum);  // ***** crux of the job system
@@ -76,7 +91,10 @@ const runJob = async (params) => {
                 operation: rowResult.operation,
                 targetTable:targetTable,
                 PK: pkValue,
+                jobTimestamp: jobTimestamp,
+                jobTimestampMs: jobTimestampMs,
                 jobSecond: jobSecond,
+                jobElapsed: jobElapsed,
                 latency: rowResult.latency,
                 httpStatusCode: rowResult?.result?.$metadata?.httpStatusCode,
                 attempts: rowResult?.result?.$metadata?.attempts,
@@ -109,16 +127,8 @@ const runJob = async (params) => {
         if(err?.code === 'ENOENT') {
             const dataFile = await fs.appendFile( dir + '/data.csv', jrColumns.toString(), 'utf-8', { flag: 'a' } );
         }
-        // console.log('*** fs err' + JSON.stringify(err));
     }
-
-    // await fs.access(dir + '/data.csv', fs.constants.F_OK, (err) => {
-    //     console.log(`***** ${file} ${err ? 'does not exist' : 'exists'}`);
-    // });
-
-    const dataFile = await fs.appendFile( dir + '/data.csv', resultsFileData, 'utf-8', { flag: 'a' } );
-
-    console.log('created ' + dir);
+    await fs.appendFile( dir + '/data.csv', resultsFileData, 'utf-8', { flag: 'a' } );
 
     return jobResults;
 }

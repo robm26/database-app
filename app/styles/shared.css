@@ -318,9 +318,10 @@
 }
 
 .resultDisplayTable  td, th {
-    padding:6px;
+    padding:2px;
     border-radius: 0px;
     background-color: #bcd;
+    font-size:smaller;
 }
 .jobResultsTable {
     background-color:gainsboro;
@@ -385,5 +386,26 @@
 }
 .chartDiv {
     width:600px;
-    height:500px;
+    height:300px;
+    margin-bottom:20px;
+}
+
+.jobResultsSummaryTable a {
+    color:black;
+    font-size:smaller;
+}
+
+.setupTableButton {
+    border:none;
+    font-size:larger;
+    background-color:gainsboro;
+    color:dimgrey;
+}
+
+.setupFileContents {
+    font-family: monospace;
+    color:dimgrey;
+    padding:10px;
+    border-radius:5px;
+    padding:10px;
 }

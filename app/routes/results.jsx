@@ -50,7 +50,7 @@ export default function Results() {
     }</td></tr>);
 
     return(
-        <Form id="experimentListForm" method="post"  >
+
         <div className="rootContainer">
             <Menu page='results' />
 
@@ -69,7 +69,7 @@ export default function Results() {
                                     </Link>
                                 </td></tr>)
                         })}
-                        {currentExperimentName ? null : clearButton}
+                        {/*{currentExperimentName ? null : clearButton}*/}
                         </tbody>
                     </table>
                 </td>
@@ -81,6 +81,6 @@ export default function Results() {
             </table>
 
         </div>
-        </Form>
+
     );
 }

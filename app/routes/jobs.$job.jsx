@@ -98,7 +98,7 @@ export default function Job(params) {
                     <tbody>
                     <tr><td className='jobDetailsTitle'>
                         type
-                        </td>
+                    </td>
                         <td>
                             {data.info.jobType.toUpperCase()}
                         </td>
@@ -123,12 +123,12 @@ export default function Job(params) {
                     </td></tr>
 
                     <tr><td></td><td colSpan='3'>
-                            <button type='submit' name='_action' value={'code' + Math.random().toString()} >View Code</button>
-                            &nbsp;&nbsp;
-                            <button type='submit' name='_action' value='preview'>Preview</button>
-                            &nbsp;&nbsp;
-                            <button type='submit' name='_action' value='clear'>Clear</button>
-                        </td>
+                        <button type='submit' name='_action' value={'code' + Math.random().toString()} >View Code</button>
+                        &nbsp;&nbsp;
+                        <button type='submit' name='_action' value='preview'>Preview</button>
+                        &nbsp;&nbsp;
+                        <button type='submit' name='_action' value='clear'>Clear</button>
+                    </td>
                     </tr>
                     <tr><td className='jobDetailsTitle'>Run job on:</td><td>
                         <button type='submit' name='_action' value='run-mysql' className='mysqlSetupButton'
@@ -154,8 +154,11 @@ export default function Job(params) {
                   defaultValue={actionData?.code}>
                 </textarea>
     );
-    const jobResultColumnList = ['rowNum','dbEngine','targetTable', 'PK', 'operation', 'jobSecond',
-        'latency','experiment','test','httpStatusCode', 'attempts','ConsumedCapacity'];
+
+    const jobResultColumnList = ['rowNum','dbEngine','targetTable', 'PK',
+        'operation', 'jobFile', 'jobSecond', 'jobElapsed', 'jobTimestamp', 'jobTimestampMs',
+        'latency','experiment','test',
+        'httpStatusCode', 'attempts','ConsumedCapacity'];
 
 
     const itemsProcessed = actionData?.jobResultsRaw?.length;
@@ -171,21 +174,22 @@ export default function Job(params) {
                 <thead><tr><th colSpan='2'>Job Summary</th></tr></thead>
                 <tbody>
 
-                    <tr><td>Engine</td><td>{actionData?.jobResultsRaw[0]?.dbEngine}</td></tr>
-                    <tr><td>Items Processed</td><td>{itemsProcessed}</td></tr>
-                    {/*<tr><td>Total Duration (sec)</td><td>{totalDuration}</td></tr>*/}
-                    {/*<tr><td>Average Velocity (items/sec)</td><td>{averageVelocity}</td></tr>*/}
-                    <tr><td>Average request Latency (ms)</td><td>{averageLatency}</td></tr>
+                <tr><td>Engine</td><td>{actionData?.jobResultsRaw[0]?.dbEngine}</td></tr>
+                <tr><td>Items Processed</td><td>{itemsProcessed}</td></tr>
+                {/*<tr><td>Total Duration (sec)</td><td>{totalDuration}</td></tr>*/}
+                {/*<tr><td>Average Velocity (items/sec)</td><td>{averageVelocity}</td></tr>*/}
+                <tr><td>Average request Latency (ms)</td><td>{averageLatency}</td></tr>
                 </tbody>
             </table>
             <br/>
 
-            <table className='resultDisplayTable'>
+            <details>
+                <summary>Result details</summary>
+                <table className='resultDisplayTable'>
                 <thead>
-
                 <tr>
                     {jobResultColumnList.map((col, index) => {
-                        return (<th>{col}</th>);
+                        return (<th key={index}>{col}</th>);
                     })}
                 </tr>
                 </thead><tbody>
@@ -203,6 +207,7 @@ export default function Job(params) {
                 );
             })}
             </tbody></table>
+            </details>
         </div>
     );
 
@@ -221,4 +226,3 @@ export default function Job(params) {
     );
 
 }
-

@@ -12,7 +12,7 @@ const run = async () => {
     };
 
     const results = await runJob(params);
-    console.log(results);
+    // console.log(results);
 };
 
 void run().then(()=>{
