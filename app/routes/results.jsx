@@ -25,7 +25,13 @@ export async function action({ params, request }) {
     }
 }
 export const loader = async ({ params, request }) => {
-    const experimentFolders = await fs.readdir('./' + experimentResultsRoot);
+    let experimentFolders = [];
+    try {
+        experimentFolders = await fs.readdir('./' + experimentResultsRoot);
+    } catch (error) {
+        console.log('no experiment folders yet');
+    }
+
 
     return {
         experimentFolders: experimentFolders,
@@ -59,7 +65,9 @@ export default function Results() {
                 <tr><td>
                     <table className='jobList'>
                         <tbody>
-
+                        {data.experimentFolders.length === 0 ? (<tr><td>
+                            Job results will appear here. Click the jobs menu to run a job.
+                        </td></tr>) : null}
                         {data.experimentFolders.map((experiment,index) => {
 
                             return(<tr key={index}>

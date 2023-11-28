@@ -56,14 +56,16 @@ export default function Jobs(params) {
         </p>
         <p>The read or write items are converted to SQL or PartiQL commands,
             and sent to <b>database.mjs</b> which in turn runs the commands on the target
-            database, either MySQL or DynamoDB.</p>
+            database table.</p>
         <p>
             For each request, the round trip latency along with several metadata parameters are
             captured and appended to a file called data.csv.  The CSV file data can be viewed by
             clicking the <a href='/results'>results</a> tab.
             Each named experiment will generate a corresponding folder within the
-            /experiments folder on the application filesystem.
+            /experiments folder on the application filesystem. Each test's name will appear as a
+            separately plotted measure in on the result charts.
         </p>
+
 
     </div>);
 

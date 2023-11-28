@@ -69,12 +69,13 @@ const runJob = async (params) => {
             const pkValue = row[PK];
 
             let rowResult;
+
             if(dbEngine === 'mysql') {
                 const sql = 'INSERT INTO ' + targetTable + ' (' + Object.keys(row).join(",") + ') '
                     + 'VALUES (' + Object.values(row).map(val=> "'" + val + "'").join(",") + ');';
                 rowResult = await runSql(sql);
-
             }
+
             if(dbEngine === 'dynamodb') {
                 const pqlDoubleQuotes = "INSERT INTO " + targetTable + " VALUE " + JSON.stringify(row) + ";";
                 const pql = pqlDoubleQuotes.replaceAll('"', "'");
@@ -92,8 +93,8 @@ const runJob = async (params) => {
                 targetTable:targetTable,
                 PK: pkValue,
                 jobTimestamp: jobTimestamp,
-                jobTimestampMs: jobTimestampMs,
                 jobSecond: jobSecond,
+                jobTimestampMs: jobTimestampMs,
                 jobElapsed: jobElapsed,
                 latency: rowResult.latency,
                 httpStatusCode: rowResult?.result?.$metadata?.httpStatusCode,

@@ -1,0 +1,9 @@
+{ "TableName": "cities",
+  "BillingMode": "PAY_PER_REQUEST",
+  "AttributeDefinitions": [
+    {"AttributeName": "city", "AttributeType": "S"}
+  ],
+  "KeySchema": [
+    {"KeyType": "HASH", "AttributeName": "city"}
+  ]
+}

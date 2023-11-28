@@ -24,6 +24,8 @@ export async function action({ params, request }) {
     const _action = body.get("_action");
     const experiment = body.get("experiment");
     const test = body.get("test");
+    const targetTable = body.get("targetTable");
+    // const compare = body.get("compare");
 
     let returned = {_action: _action};
 
@@ -59,7 +61,7 @@ export async function action({ params, request }) {
             job:jobId,
             dbEngine: dbEngine,
             PK:jobInfo.PK,
-            targetTable: jobInfo.targetTable,
+            targetTable: targetTable,
             jobFile: jobFileNameImport
         };
 
@@ -96,33 +98,41 @@ export default function Job(params) {
             <div className='jobFormTableDiv'>
                 <table className='jobFormTable'>
                     <tbody>
-                    <tr><td className='jobDetailsTitle'>
-                        type
+                    <tr key={1}><td className='jobDetailsTitle'>
+                        Description
+                    </td><td colSpan='3'>
+                        {data.info.description}
+                    </td></tr>
+                    <tr key={2}><td className='jobDetailsTitle'>
+                        Type
                     </td>
                         <td>
                             {data.info.jobType.toUpperCase()}
                         </td>
                     </tr>
-                    <tr><td className='jobDetailsTitle'>
-                        description
-                    </td><td colSpan='3'>
-                        {data.info.description}
-                    </td></tr>
-                    <tr><td className='jobDetailsTitle'>
+                    <tr key={3}><td className='jobDetailsTitle'>
                         Item count
                     </td><td colSpan='3'>
                         {data.info.items}
                     </td></tr>
-                    <tr><td className='jobDetailsTitle'>Experiment</td><td>
+                    <tr key={4}><td className='jobDetailsTitle'>Experiment</td><td>
                         <input type='text' name='experiment' id='experiment' className='jobInputs'
                                defaultValue={actionData?.experiment || 'Experiment 1'} />
                     </td></tr>
-                    <tr><td className='jobDetailsTitle'>Test</td><td>
+                    <tr key={5}><td className='jobDetailsTitle'>Test</td><td>
                         <input type='text' name='test' id='test' className='jobInputs'
                                defaultValue={actionData?.test || 'Test 1'} />
                     </td></tr>
+                    <tr key={6}><td className='jobDetailsTitle'>Target Table</td><td>
+                        <input type='text' name='targetTable' id='targetTable' className='jobInputs'
+                               defaultValue={actionData?.targetTable || data?.info?.targetTable || ''} />
+                    </td></tr>
+                    {/*<tr key={7}><td className='jobDetailsTitle'>Compare</td><td>*/}
+                    {/*    <input type='text' name='compare' id='compare' className='jobInputs'*/}
+                    {/*           defaultValue={actionData?.compare || 'dbEngine'} />*/}
+                    {/*</td></tr>*/}
 
-                    <tr><td></td><td colSpan='3'>
+                    <tr key={8}><td></td><td colSpan='3'>
                         <button type='submit' name='_action' value={'code' + Math.random().toString()} >View Code</button>
                         &nbsp;&nbsp;
                         <button type='submit' name='_action' value='preview'>Preview</button>
@@ -130,7 +140,7 @@ export default function Job(params) {
                         <button type='submit' name='_action' value='clear'>Clear</button>
                     </td>
                     </tr>
-                    <tr><td className='jobDetailsTitle'>Run job on:</td><td>
+                    <tr key={9}><td className='jobDetailsTitle'>Run job on:</td><td>
                         <button type='submit' name='_action' value='run-mysql' className='mysqlSetupButton'
                         >MySQL</button>
                     </td><td>
@@ -171,14 +181,15 @@ export default function Job(params) {
         <div>
             Job Results:
             <table className='jobResultsSummaryTable'>
-                <thead><tr><th colSpan='2'>Job Summary</th></tr></thead>
+                <thead>
+                <tr key={1}><th colSpan='2'>Job Summary</th></tr></thead>
                 <tbody>
 
-                <tr><td>Engine</td><td>{actionData?.jobResultsRaw[0]?.dbEngine}</td></tr>
+                <tr key={2}><td>Engine</td><td>{actionData?.jobResultsRaw[0]?.dbEngine}</td></tr>
                 <tr><td>Items Processed</td><td>{itemsProcessed}</td></tr>
                 {/*<tr><td>Total Duration (sec)</td><td>{totalDuration}</td></tr>*/}
                 {/*<tr><td>Average Velocity (items/sec)</td><td>{averageVelocity}</td></tr>*/}
-                <tr><td>Average request Latency (ms)</td><td>{averageLatency}</td></tr>
+                <tr key={3}><td>Average request Latency (ms)</td><td>{averageLatency}</td></tr>
                 </tbody>
             </table>
             <br/>
@@ -187,7 +198,7 @@ export default function Job(params) {
                 <summary>Result details</summary>
                 <table className='resultDisplayTable'>
                 <thead>
-                <tr>
+                <tr key={1}>
                     {jobResultColumnList.map((col, index) => {
                         return (<th key={index}>{col}</th>);
                     })}
@@ -200,7 +211,7 @@ export default function Job(params) {
                     <tr key={index}>
                         {jobResultColumnList.map((col, index) => {
 
-                            return (<td>{result[col]}</td>);
+                            return (<td key={index}>{result[col]}</td>);
                         })}
 
                     </tr>

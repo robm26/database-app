@@ -18,7 +18,7 @@ sql = "select * from customers ";
 // console.log(sql);
 // console.log(Math.random());
 
-let db = 'dynamodb';
+let db = 'mysql';
 
 if (process.argv.length > 2) {
     db = process.argv[2];

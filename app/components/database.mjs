@@ -1,4 +1,6 @@
-import mysql from "mysql2/promise";
+import mysql2 from "mysql2/promise";
+import mysql from "mysql2";
+
 import {config} from "./mysql-credentials.mjs";
 
 import {DynamoDBClient} from "@aws-sdk/client-dynamodb";
@@ -6,6 +8,10 @@ import {ExecuteStatementCommand, DynamoDBDocumentClient} from "@aws-sdk/lib-dyna
 
 const client = new DynamoDBClient({});
 const docClient = DynamoDBDocumentClient.from(client);
+
+
+const pool = mysql.createPool(config);
+const mysqlPool = pool.promise();
 
 const runPartiQL = async (sql) => {
 
@@ -68,11 +74,9 @@ const runSql = async (sql) => {
     let operation = (sql).trim().split(" ")[0].toLowerCase();
 
     try {
-        const connection = await mysql.createConnection(config);
 
         timeStart = new Date();
-
-        const [rows, fields] = await connection.execute(sql);
+        const [rows] = await mysqlPool.query(sql);  // uses a pool connection and auto-releases it
 
         timeEnd = new Date();
         latency = timeEnd - timeStart;
@@ -82,8 +86,6 @@ const runSql = async (sql) => {
         } else {
             result = rows;
         }
-
-        await connection.end();
 
     }  catch (error) {
         timeEnd = new Date();
@@ -98,5 +100,4 @@ const runSql = async (sql) => {
 }
 
 
-export {runSql, runPartiQL};
-
+export { runSql, runPartiQL};

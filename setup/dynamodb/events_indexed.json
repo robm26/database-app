@@ -1,0 +1,41 @@
+{ "TableName": "events_indexed",
+  "BillingMode": "PAY_PER_REQUEST",
+  "AttributeDefinitions": [
+    {"AttributeName": "event_id", "AttributeType": "S"},
+    {"AttributeName": "product", "AttributeType": "S"},
+    {"AttributeName": "rating", "AttributeType": "N"},
+    {"AttributeName": "city", "AttributeType": "S"},
+    {"AttributeName": "status", "AttributeType": "S"},
+    {"AttributeName": "last_updated", "AttributeType": "S"}
+  ],
+  "KeySchema": [
+    {"KeyType": "HASH", "AttributeName": "event_id"}
+  ],
+  "GlobalSecondaryIndexes": [
+    {
+      "IndexName": "GSI1",
+      "KeySchema": [
+                  { "AttributeName": "product", "KeyType": "HASH" },
+                  { "AttributeName": "rating", "KeyType": "RANGE" }
+      ],
+      "Projection": {"ProjectionType": "ALL"}
+    },
+    {
+      "IndexName": "GSI2",
+      "KeySchema": [
+        { "AttributeName": "city", "KeyType": "HASH" },
+        { "AttributeName": "status", "KeyType": "RANGE" }
+      ],
+      "Projection": {"ProjectionType": "ALL"}
+    },
+    {
+      "IndexName": "GSI3",
+      "KeySchema": [
+        { "AttributeName": "status", "KeyType": "HASH" },
+        { "AttributeName": "last_updated", "KeyType": "RANGE" }
+      ],
+      "Projection": {"ProjectionType": "ALL"}
+    }
+  ]
+}
+

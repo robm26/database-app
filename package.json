@@ -18,6 +18,7 @@
     "@remix-run/react": "^1.19.3",
     "@remix-run/serve": "^1.19.3",
     "chart.js": "^4.4.0",
+    "chartjs-plugin-annotation": "^3.0.1",
     "csvtojson": "^2.0.10",
     "isbot": "^3.6.8",
     "mysql2": "^3.6.2",

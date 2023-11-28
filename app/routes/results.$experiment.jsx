@@ -6,9 +6,7 @@ import {
 import * as fs from 'node:fs/promises';
 import { ClientOnly } from 'remix-utils';
 
-
 import {ChartMaker} from "~/components/chartMaker";
-
 
 import {
     Chart as ChartJS,

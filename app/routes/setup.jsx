@@ -127,15 +127,18 @@ export default function Setup() {
                     <td>Create Table Commands<br/>
                         <span className='path'>database_app/setup/mysql/</span>
                     </td>
-                    <td>Connection Details<br/>
-                    <span className='path'>/app/components/mysql-credentials.mjs</span>
+                    <td>Table Details<br/>
+
                     </td>
                 </tr>
                 <tr>
                     <td rowSpan='2' >
                         Connection Details
                         <details>
-                            <summary></summary>
+                            <summary>
+                                <span className='path'>/app/components/mysql-credentials.mjs</span>
+                            </summary>
+                            <br/>
                             <table className='mysqlConnectionInfo'>
                                 <tbody>
                                 <tr><td>Host</td><td className='path'>{mySqlHost}</td></tr>
@@ -166,9 +169,7 @@ export default function Setup() {
                                     {actionData?.fileContentsMysql}
                                 </pre>
                         </div>
-                        {/*<textarea id={'mysqlTextarea'} className='setupFileContents' rows={'15'} cols={'80'}*/}
-                        {/*      defaultValue={actionData?.fileContentsMysql}>*/}
-                        {/*</textarea>*/}
+
                     </div>
                 </td>
                 </tr>
@@ -188,13 +189,20 @@ export default function Setup() {
                     <td>New Table Definitions<br/>
                     <span className='path'>database_app/setup/dynamodb/</span>
                     </td>
-                    <td>Connection Details<br/>
-                        <span className='path'>IAM Identity set in shell environment</span></td>
+                    <td>Table Details<br/>
+
+                    </td>
                 </tr><tr>
                     <td rowSpan='2'>
                         Connection Details
+
                         <details>
-                            <summary></summary>
+                            <summary>
+                                <span className='path'>IAM Identity set in shell environment</span>
+                                <br/>
+                            </summary>
+                            <br/>
+
                             <table className='ddbConnectionInfo'>
                                 <tbody>
                                 <tr><td>Endpoint</td><td className='path'>{data.ddbResponse.Endpoints[0].Address}</td></tr>

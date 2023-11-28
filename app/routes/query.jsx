@@ -14,7 +14,6 @@ export async function action({ params, request }) {
 
     const body = await request.formData();
     const _action = body.get("_action");
-
     const sqlInput = (body.get('sqlInput'));
 
     let result;
