@@ -26,6 +26,7 @@ const runJob = async (params) => {
     const test = params['test'];
     const dbEngine = params['dbEngine'];
     const targetTable = params['targetTable'];
+    const items = params['items'];
     const PK = params['PK'];
     const jobFile = params['jobFile'];
 
@@ -53,7 +54,7 @@ const runJob = async (params) => {
 
     if(jobInfo.jobType.toUpperCase() === 'INSERT') {
         const rowLimit = 100000000;
-        const loopLimit = Math.min(rowLimit, jobInfo.items);
+        const loopLimit = Math.min(rowLimit, items);
 
         for(let rowNum = 1; rowNum <= loopLimit; rowNum++){
 

@@ -25,6 +25,7 @@ export async function action({ params, request }) {
     const experiment = body.get("experiment");
     const test = body.get("test");
     const targetTable = body.get("targetTable");
+    const items = body.get("items");
     // const compare = body.get("compare");
 
     let returned = {_action: _action};
@@ -60,6 +61,7 @@ export async function action({ params, request }) {
             test: test,
             job:jobId,
             dbEngine: dbEngine,
+            items:items,
             PK:jobInfo.PK,
             targetTable: targetTable,
             jobFile: jobFileNameImport
@@ -127,10 +129,10 @@ export default function Job(params) {
                         <input type='text' name='targetTable' id='targetTable' className='jobInputs'
                                defaultValue={actionData?.targetTable || data?.info?.targetTable || ''} />
                     </td></tr>
-                    {/*<tr key={7}><td className='jobDetailsTitle'>Compare</td><td>*/}
-                    {/*    <input type='text' name='compare' id='compare' className='jobInputs'*/}
-                    {/*           defaultValue={actionData?.compare || 'dbEngine'} />*/}
-                    {/*</td></tr>*/}
+                    <tr key={7}><td className='jobDetailsTitle'>Items</td><td>
+                        <input type='text' name='items' id='items' className='jobInputs'
+                               defaultValue={data?.info?.items || 100} />
+                    </td></tr>
 
                     <tr key={8}><td></td><td colSpan='3'>
                         <button type='submit' name='_action' value={'code' + Math.random().toString()} >View Code</button>
