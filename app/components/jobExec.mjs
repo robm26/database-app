@@ -5,20 +5,15 @@ import { runPartiQL } from "../components/database.mjs";
 const experimentResultsRoot = 'public/experiments';
 
 let pathToJobsFolder = '../../jobs/'; // path if running a unit test
-// let pathToExperimentsFolder = '../../experiments/';
 let pathToExperimentsFolder = '../../' + experimentResultsRoot + '/';
 
 const args = process.argv;
 
 if(args.length === 3 && args[2] == 'build/index.js') { // live app
     pathToJobsFolder = '../jobs/';  // npm run dev
-    // pathToExperimentsFolder = './experiments/';
     pathToExperimentsFolder = './' + experimentResultsRoot + '/';
 }
 
-const settings = {
-
-}
 
 const runJob = async (params) => {
 
@@ -40,9 +35,11 @@ const runJob = async (params) => {
     const sleep = ms => new Promise(r => setTimeout(r, ms));
 
     let jobSecond = 0;
+    let previousJobSecond = 1;
     let jobTimestamp = 0;
     let jobTimestampMs = 0;
     let jobElapsed = 0;
+    let requestsThisSecond = 0;
 
     let startMs = Date.now();
     const startSec = Math.floor(startMs/1000);
@@ -51,6 +48,8 @@ const runJob = async (params) => {
     await sleep(msUntilNextSec);
 
     startMs = Date.now();
+    let rowSummary;
+    let newSecond = false;
 
     if(jobInfo.jobType.toUpperCase() === 'INSERT') {
         const rowLimit = 100000000;
@@ -65,6 +64,28 @@ const runJob = async (params) => {
 
             nowSec = Math.floor(nowNow/1000);
             jobSecond = nowSec - startSec;
+            if (jobSecond === previousJobSecond) {
+                newSecond = false;
+                requestsThisSecond += 1;
+
+                if(rowNum > 1) {
+                    jobResults.push(rowSummary); // previous loop's summary here
+                }
+
+            } else {
+                newSecond = true;
+                // we detected a new second. Emit the previous loop's summary with last second's stats
+
+                rowSummary['velocity'] = requestsThisSecond;
+
+                if(rowNum > 1) {
+                    jobResults.push(rowSummary);
+                }
+
+                requestsThisSecond = 1;
+                previousJobSecond = jobSecond;
+            }
+
 
             const row = job.rowMaker(rowNum);  // ***** crux of the job system
             const pkValue = row[PK];
@@ -84,7 +105,7 @@ const runJob = async (params) => {
 
             }
             // console.log(JSON.stringify(rowResult, null, 2));
-            let rowSummary = {
+            rowSummary = {
                 rowNum: rowNum,
                 dbEngine: dbEngine,
                 experiment: experiment,
@@ -98,14 +119,19 @@ const runJob = async (params) => {
                 jobTimestampMs: jobTimestampMs,
                 jobElapsed: jobElapsed,
                 latency: rowResult.latency,
+                velocity: null,
                 httpStatusCode: rowResult?.result?.$metadata?.httpStatusCode,
                 attempts: rowResult?.result?.$metadata?.attempts,
                 ConsumedCapacity: rowResult?.result?.ConsumedCapacity?.CapacityUnits
             };
 
-            // rowResult enrichment
-            jobResults.push(rowSummary);
+            // normally, emit request stats after each request.
+            // But, we will wait and do it once the next loop begins,
+            // to see if we can include a complete second summary for a finished second.
+            //
+            // jobResults.push(rowSummary);
         }
+        jobResults.push(rowSummary); // final summary
     }
 
     const jrColumns = Object.keys(jobResults[0]);

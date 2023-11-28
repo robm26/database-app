@@ -5,9 +5,9 @@ const run = async () => {
     const params = {
         experiment: 'Exp7',
         test: 'ProductsTest2',
-        dbEngine: 'dynamodb',
+        dbEngine: 'mysql',
         targetTable: 'products',
-        items: 4,
+        items: 10,
         PK: 'prod_id',
         jobFile: 'load-products.js'
     };

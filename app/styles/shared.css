@@ -374,8 +374,11 @@
     color:dimgrey;
 }
 .downloadDiv {
+    color:grey;
+    padding:3px;
+    font-size:x-small;
+    float:right;
 
-    font-size:smaller;
 }
 .downloadDiv a {
     color:dimgray;
@@ -388,6 +391,7 @@
     width:600px;
     height:500px;
     margin-bottom:20px;
+
 }
 
 .jobResultsSummaryTable a {

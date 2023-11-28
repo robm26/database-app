@@ -112,11 +112,6 @@ export default function Job(params) {
                             {data.info.jobType.toUpperCase()}
                         </td>
                     </tr>
-                    <tr key={3}><td className='jobDetailsTitle'>
-                        Item count
-                    </td><td colSpan='3'>
-                        {data.info.items}
-                    </td></tr>
                     <tr key={4}><td className='jobDetailsTitle'>Experiment</td><td>
                         <input type='text' name='experiment' id='experiment' className='jobInputs'
                                defaultValue={actionData?.experiment || 'Experiment 1'} />
@@ -169,7 +164,7 @@ export default function Job(params) {
 
     const jobResultColumnList = ['rowNum','dbEngine','targetTable', 'PK',
         'operation', 'jobFile', 'jobSecond', 'jobElapsed', 'jobTimestamp', 'jobTimestampMs',
-        'latency','experiment','test',
+        'latency', 'velocity', 'experiment','test',
         'httpStatusCode', 'attempts','ConsumedCapacity'];
 
 

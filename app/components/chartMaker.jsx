@@ -30,22 +30,28 @@ ChartJS.register(
 export function ChartMaker(parms) {
 
     const params = parms.params;
-
-    const debug = (<textarea rows={300} cols={100}>
-        {JSON.stringify(params, null, 2)}
-    </textarea>);
-
     let xAxisMax = 0;
-    let compareValues = Array.from(new Set(params.fileDataObj.map((line) => line['test'])));
+    let yAxisUnits = params.measure === 'latency' ? ' ms' : null;
+
     const annotations = {};
     let statsRows = [];
 
+
+    // split dataset into sections by the (Experiment.test) test value
+    let compareValues = Array.from(new Set(params.fileDataObj.map((line) => line['test'])));
+
     const dataSets = compareValues.map((val, index) => {
         let myDataSet = params.fileDataObj.filter((row) => {
-            return row['test'] === val;
+            let subFilter = true;
+            if(params['yAgg'] === 'actual') {
+                return row['test'] === val;
+            }
+
+            return row['test'] === val && row[params['measure']]; // skip any that don't have the measure (like final velocity)
         });
 
         xAxisMax = myDataSet[myDataSet.length-1][params.xAxis] > xAxisMax ? myDataSet[myDataSet.length-1][params.xAxis] : xAxisMax;
+
 
         let setStats =  summarize(myDataSet.map((row) => parseInt(row[params.measure])));
 
@@ -98,7 +104,7 @@ export function ChartMaker(parms) {
             annotation: {annotations: annotations}
         },
         scales: {
-            y: {ticks: {callback: (label) => label + ' ms',}}
+            y: {ticks: {callback: (label) => label + yAxisUnits}}
         }
     };
 
@@ -107,25 +113,29 @@ export function ChartMaker(parms) {
         datasets: dataSets
     };
 
+    let resultsSummaryTable = (
+        <table className='experimentResultSummaryTable'><thead>
+        <tr><th>name</th><th>table</th><th>avg latency (ms)</th></tr>
+        </thead>
+            <tbody>
+            {statsRows.map((row, index) => {
+                return (<tr key={index} >
+
+                    <td>{row.name}</td>
+                    <td>{row.targetTable}</td>
+                    <td>{parseInt(row.avg)}</td>
+                </tr>);
+            })}
+            </tbody></table>
+    );
+
     return (
         (<div>
             <Line
             options={options}
             data={resultsData} />
             <br/>
-            <table className='experimentResultSummaryTable'><thead>
-                <tr><th>name</th><th>table</th><th>avg latency (ms)</th></tr>
-            </thead>
-            <tbody>
-                {statsRows.map((row, index) => {
-                    return (<tr key={index} >
-
-                        <td>{row.name}</td>
-                        <td>{row.targetTable}</td>
-                        <td>{parseInt(row.avg)}</td>
-                    </tr>);
-                })}
-            </tbody></table>
+            {params['measure'] === 'latency' ? resultsSummaryTable : null}
         </div>)
     );
 

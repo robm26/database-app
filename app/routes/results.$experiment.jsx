@@ -36,8 +36,6 @@ ChartJS.register(
     Legend
 );
 
-
-
 export const loader = async ({ params, request }) => {
 
     const fileData = await fs.readFile( experimentResultsRoot + '/' +  params.experiment + '/data.csv', 'utf-8');
@@ -47,7 +45,6 @@ export const loader = async ({ params, request }) => {
 
     const chartParams1 = {
         fileDataObj: fileDataObj,
-        compare: 'dbEngine',
         measure: 'latency',
         yAgg: 'actual',
         xAxis: 'rowNum',
@@ -56,15 +53,14 @@ export const loader = async ({ params, request }) => {
 
     const chartParams2 = {
         fileDataObj: fileDataObj,
-        compare: 'dbEngine',
-        measure: 'jobTimestampMs',
-        yAgg: 'actual',
-        xAxis: 'rowNum',
+        measure: 'velocity',
+        yAgg: 'max',
+        xAxis: 'jobSecond',
         chartType: 'Line'
     };
 
     allChartParams.push(chartParams1);
-    // allChartParams.push(chartParams2);
+    allChartParams.push(chartParams2);
 
 
     return {
@@ -86,6 +82,19 @@ export default function Experiment() {
     const dataPreviewRaw = data.fileData.slice(0, 1000);
     const dataPreview = dataPreviewRaw.slice(0, dataPreviewRaw.lastIndexOf('\n'));
 
+    const downloadExcelLink = (
+        <div className={'downloadDiv'}>
+            <b>data.csv :</b>
+            &nbsp;&nbsp;
+            <a href={'/' + experimentResultsPublicFolder + '/' + experiment + '/data.csv'}
+               download={experiment + '-data.csv'}>
+                {'download CSV'}</a>
+            &nbsp;&nbsp;
+            <a href={'ms-excel:ofe|u|http://localhost:3000/' + experimentResultsPublicFolder + '/' + experiment + '/data.csv'}
+               download={experiment + '-data.csv'}>
+                {'open in Excel'}</a>
+        </div>
+    );
 
     const experimentForm = (
         <Form id="experimentForm" method="post"  >
@@ -104,31 +113,13 @@ export default function Experiment() {
                     })
                 }
 
-                <br/>
-                <div>
-                    <div className={'downloadDiv'}>
-                        <b>data.csv :</b>
-                        &nbsp;&nbsp;
-                        <a href={'/' + experimentResultsPublicFolder + '/' + experiment + '/data.csv'}
-                           download={experiment + '-data.csv'}>
-                            {'download CSV'}</a>
-                        &nbsp;&nbsp;
-                        <a href={'ms-excel:ofe|u|http://localhost:3000/' + experimentResultsPublicFolder + '/' + experiment + '/data.csv'}
-                           download={experiment + '-data.csv'}>
-                            {'open in Excel'}</a>
-                    </div>
-                    <br/>
-                    <details>
-                        <summary>Data sample</summary>
-                        <textarea rows='10' cols='80' className='viewCodeTextarea' defaultValue={dataPreview} ></textarea>
-                    </details>
-                </div>
             </div>
         </Form>
     );
 
     return(
         <div>
+            {downloadExcelLink}
             <div >{experimentForm}</div>
 
         </div>
