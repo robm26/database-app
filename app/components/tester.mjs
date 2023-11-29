@@ -8,7 +8,17 @@ console.log('cwData');
 
 let sql;
 
-sql = "select * from customers ";
+sql = "select * from events_indexed ";
+
+sql = "INSERT INTO events_indexed VALUE {" +
+    "    'event_id':'e0022'," +
+    "    'product':'Skateboard'," +
+    "    'rating':636," +
+    "    'status':'ACTIVE'," +
+    "    'balance':133," +
+    "    'last_updated':'2023-11-22'" +
+    "};";
+
 // sql = 'insert into users (user_id, firstname, lastname, city) values ("333", "Taddy", "Fish", "Wakefield")';
 // let sql = "update users set credit_rating = 700 where user_id = '1000'";
 
@@ -18,7 +28,8 @@ sql = "select * from customers ";
 // console.log(sql);
 // console.log(Math.random());
 
-let db = 'mysql';
+
+let db = 'dynamodb';
 
 if (process.argv.length > 2) {
     db = process.argv[2];

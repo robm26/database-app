@@ -15,6 +15,9 @@ const mysqlPool = pool.promise();
 
 const runPartiQL = async (sql) => {
 
+    // console.log(sql);
+    // console.log();
+
     let latency = 0;
     let response;
     let timeStart;
@@ -49,7 +52,7 @@ const runPartiQL = async (sql) => {
             },
             affectedRows: 0
         };
-        console.log(sql);
+        // console.log(sql);
 
         console.log(JSON.stringify(error, null, 2));
 
@@ -101,3 +104,4 @@ const runSql = async (sql) => {
 
 
 export { runSql, runPartiQL};
+

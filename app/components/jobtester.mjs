@@ -3,13 +3,13 @@ import {runJob} from "./jobExec.mjs";
 const run = async () => {
 
     const params = {
-        experiment: 'Exp7',
-        test: 'ProductsTest2',
-        dbEngine: 'mysql',
-        targetTable: 'products',
+        experiment: 'Exp3',
+        test: 'EventsTest',
+        dbEngine: 'dynamodb',
+        targetTable: 'events_indexed',
         items: 10,
-        PK: 'prod_id',
-        jobFile: 'load-products.js'
+        PK: 'event_id',
+        jobFile: 'load-events.js'
     };
 
     const results = await runJob(params);

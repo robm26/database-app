@@ -138,9 +138,7 @@ const runJob = async (params) => {
 
     const resultsFileData = jobResults.map(
         (item, index) => {
-
             return('\n' + jrColumns.map((col, idx) => {
-
                 return(item[col]);
             }) );
         }).join('');

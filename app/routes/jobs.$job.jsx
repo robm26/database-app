@@ -204,6 +204,7 @@ export default function Job(params) {
 
             {actionData.jobResultsRaw.map((result, index)=>{
 
+
                 return(
                     <tr key={index}>
                         {jobResultColumnList.map((col, index) => {

@@ -1,8 +1,8 @@
 const {randomString, pseudoRandomElement, randomElement} = require('../app/components/util');
 
 const rowMaker = (tick, second) => {
-    const cities = ['Boston', 'New York', 'Seattle', 'Portland', 'San Jose', 'Atlanta', 'Los Angeles', 'Dallas', 'London', 'Dublin', 'Amsterdam', 'Tel Aviv', 'Tokyo', 'Seoul'];
-    const products = ['Bicycle', 'Car', 'Truck', 'Motorcycle', 'Bus', 'Moped', 'Tricycle', 'Scooter', 'Skateboard', 'Snowboard', 'Helicopter', 'Jet Ski', 'Kayak', 'Canoe'];
+    const cities = ['Boston', 'New York', 'Seattle', 'Portland', 'San Jose', 'Atlanta', 'Los Angeles', 'Dallas', 'London', 'Dublin', 'Amsterdam', 'Tel Aviv', 'Tokyo', 'Seoul', '', ''];
+    const products = ['Bicycle', 'Car', 'Truck', 'Motorcycle', 'Bus', 'Moped', 'Tricycle', 'Scooter', 'Skateboard', 'Snowboard', 'Helicopter', 'Jet Ski', 'Kayak', 'Canoe', '', ''];
     const statuses = ['ACTIVE', 'ACTIVE', 'ACTIVE', 'ACTIVE', 'EXPIRED', 'CANCELLED', 'RETURNED'];
     const tickOffset = tick + 20;
 

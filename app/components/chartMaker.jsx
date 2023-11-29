@@ -32,10 +32,12 @@ export function ChartMaker(parms) {
     const params = parms.params;
     let xAxisMax = 0;
     let yAxisUnits = params.measure === 'latency' ? ' ms' : null;
+    let xAxisLabel;
+    let yAxisLabel;
 
     const annotations = {};
-    let statsRows = [];
-
+    let latencyStatsRows = [];
+    let velocityStatsRows = [];
 
     // split dataset into sections by the (Experiment.test) test value
     let compareValues = Array.from(new Set(params.fileDataObj.map((line) => line['test'])));
@@ -44,14 +46,22 @@ export function ChartMaker(parms) {
         let myDataSet = params.fileDataObj.filter((row) => {
             let subFilter = true;
             if(params['yAgg'] === 'actual') {
+                if(params['measure'] === 'latency') {
+                    yAxisLabel = 'client latency';
+                    xAxisLabel = 'request number';
+                }
                 return row['test'] === val;
+            }
+
+            if(params['measure'] === 'velocity') {
+                yAxisLabel = 'requests per second';
+                xAxisLabel = 'second';
             }
 
             return row['test'] === val && row[params['measure']]; // skip any that don't have the measure (like final velocity)
         });
 
         xAxisMax = myDataSet[myDataSet.length-1][params.xAxis] > xAxisMax ? myDataSet[myDataSet.length-1][params.xAxis] : xAxisMax;
-
 
         let setStats =  summarize(myDataSet.map((row) => parseInt(row[params.measure])));
 
@@ -60,7 +70,7 @@ export function ChartMaker(parms) {
             targetTable: myDataSet[0].targetTable,
             avg: setStats.avg
         };
-        statsRows.push(statsRow);
+        latencyStatsRows.push(statsRow);
 
         let annotation = {
             type: 'line',
@@ -104,7 +114,11 @@ export function ChartMaker(parms) {
             annotation: {annotations: annotations}
         },
         scales: {
-            y: {ticks: {callback: (label) => label + yAxisUnits}}
+            y: {
+                ticks: {callback: (label) => label + yAxisUnits},
+                title: {display: true, text: yAxisLabel}
+            },
+            x: {title: {display: true, text: xAxisLabel}}
         }
     };
 
@@ -113,14 +127,29 @@ export function ChartMaker(parms) {
         datasets: dataSets
     };
 
-    let resultsSummaryTable = (
+    let latencySummaryTable = (
         <table className='experimentResultSummaryTable'><thead>
         <tr><th>name</th><th>table</th><th>avg latency (ms)</th></tr>
         </thead>
             <tbody>
-            {statsRows.map((row, index) => {
+            {latencyStatsRows.map((row, index) => {
                 return (<tr key={index} >
 
+                    <td>{row.name}</td>
+                    <td>{row.targetTable}</td>
+                    <td>{parseInt(row.avg)}</td>
+                </tr>);
+            })}
+            </tbody></table>
+    );
+
+    let velocitySummaryTable = (
+        <table className='experimentResultSummaryTable'><thead>
+        <tr><th>name</th><th>table</th><th>avg latency (ms)</th></tr>
+        </thead>
+            <tbody>
+            {latencyStatsRows.map((row, index) => {
+                return (<tr key={index} >
                     <td>{row.name}</td>
                     <td>{row.targetTable}</td>
                     <td>{parseInt(row.avg)}</td>
@@ -135,7 +164,7 @@ export function ChartMaker(parms) {
             options={options}
             data={resultsData} />
             <br/>
-            {params['measure'] === 'latency' ? resultsSummaryTable : null}
+            {params['measure'] === 'latency' ? latencySummaryTable : null}
         </div>)
     );
 
