@@ -49,6 +49,8 @@ export async function action({ params, request }) {
         }
         returned['previewRows'] = previewRows;
         returned['code'] = null;
+        console.log(previewRows);
+
     }
 
     if(_action.slice(0, 3) === 'run') {

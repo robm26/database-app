@@ -6,10 +6,10 @@ const run = async () => {
         experiment: 'Exp3',
         test: 'EventsTest',
         dbEngine: 'dynamodb',
-        targetTable: 'events_indexed',
+        targetTable: 'everysize',
         items: 10,
-        PK: 'event_id',
-        jobFile: 'load-events.js'
+        PK: 'size',
+        jobFile: 'load-everysize.js'
     };
 
     const results = await runJob(params);

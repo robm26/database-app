@@ -62,12 +62,13 @@ export default function Results() {
 
             <table className='jobsBody'>
                 <tbody>
-                <tr><td>
+                <tr><td className={'noJobMsg'}>
+                    {data.experimentFolders.length === 0 ? (<div >
+                        Job results will appear here. Click the jobs menu to run a job.
+                    </div>) : null}
+
                     <table className='jobList'>
                         <tbody>
-                        {data.experimentFolders.length === 0 ? (<tr><td>
-                            Job results will appear here. Click the jobs menu to run a job.
-                        </td></tr>) : null}
                         {data.experimentFolders.map((experiment,index) => {
 
                             return(<tr key={index}>

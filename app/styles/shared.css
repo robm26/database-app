@@ -46,6 +46,15 @@
     animation: rotation 4s infinite linear;
 
 }
+.menuHourglassListItemActive {
+    margin-top: 5px;
+    border-radius: 5px;
+    background-color: lightgreen;
+}
+
+.menuHourglassListItemDefault {
+    margin-top: 5px;
+}
 
 @keyframes rotation {
     from {transform: rotate(0deg);}
@@ -418,4 +427,8 @@
 }
 .experimentResultSummaryTable td {
     text-align:center;
+}
+.noJobMsg {
+    background-color:whitesmoke;
+    border:none;
 }

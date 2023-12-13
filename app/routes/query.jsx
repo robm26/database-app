@@ -131,7 +131,8 @@ export default function QueryIndex() {
                 <br/>
                 {result?.error && result.error.name !== 'ConditionalCheckFailedException' ?
                     (<div className='errorPanel'>
-                        {result.error.code}<br/>{result.error?.message}
+                        http {result.error.code}
+                        <br/>{result.error?.name}
                     </div>)
                     : (
                         <>

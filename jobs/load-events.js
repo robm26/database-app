@@ -15,6 +15,8 @@ const rowMaker = (tick, second) => {
         balance: 100 + pseudoRandomElement(100, tickOffset)(),
         last_updated: '2023-11-22'
     };
+
+
     return newRow;
 }
 
@@ -26,6 +28,12 @@ const jobInformation = () => {
         description: 'Load event data',
         items: 50
     };
+}
+
+function sleep(ms) {
+    return new Promise((resolve) => {
+        setTimeout(resolve, ms);
+    });
 }
 
 module.exports = { rowMaker, jobInformation };

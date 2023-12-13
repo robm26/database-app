@@ -13,7 +13,7 @@ export function Menu(params) {
             <li key="0"  >
                 <Link to="/" className='titleLink'>database-app</Link>
             </li>
-            <li >
+            <li className={['submitting', 'loading'].includes(navigation.state) ? 'menuHourglassListItemActive' : 'menuHourglassListItemDefault'}>
                 <div className='menuHourglass'>
                     {['submitting', 'loading'].includes(navigation.state) ? "⏳" :  (<>&nbsp;&nbsp;&nbsp;&nbsp;</>)}
                 </div>

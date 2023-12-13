@@ -4,8 +4,14 @@ import { runPartiQL } from "../components/database.mjs";
 
 const experimentResultsRoot = 'public/experiments';
 
+const currentPath = process.cwd().split('/');
+const currentFolder = currentPath.slice(-1)[0];
+
 let pathToJobsFolder = '../../jobs/'; // path if running a unit test
 let pathToExperimentsFolder = '../../' + experimentResultsRoot + '/';
+if(currentFolder === 'jobs') {
+    pathToExperimentsFolder = '../' + experimentResultsRoot + '/';
+}
 
 const args = process.argv;
 
@@ -57,6 +63,8 @@ const runJob = async (params) => {
 
         for(let rowNum = 1; rowNum <= loopLimit; rowNum++){
 
+            let httpStatusCode;
+            let attempts; // aws sdk retry stat
             const nowNow = Date.now();
             jobTimestamp = Math.floor(nowNow/1000);
             jobTimestampMs = nowNow - (jobTimestamp * 1000);
@@ -86,9 +94,10 @@ const runJob = async (params) => {
                 previousJobSecond = jobSecond;
             }
 
-
             const row = job.rowMaker(rowNum);  // ***** crux of the job system
+
             const pkValue = row[PK];
+
 
             let rowResult;
 
@@ -101,16 +110,20 @@ const runJob = async (params) => {
             if(dbEngine === 'dynamodb') {
                 const pqlDoubleQuotes = "INSERT INTO " + targetTable + " VALUE " + JSON.stringify(row) + ";";
                 const pql = pqlDoubleQuotes.replaceAll('"', "'");
+
                 rowResult = await runPartiQL(pql);
 
+                httpStatusCode = rowResult?.result?.$metadata?.httpStatusCode || rowResult?.result?.error?.code;
+                attempts = rowResult?.result?.$metadata?.attempts || rowResult?.result?.error?.attempts;
+
             }
-            // console.log(JSON.stringify(rowResult, null, 2));
+
             rowSummary = {
                 rowNum: rowNum,
                 dbEngine: dbEngine,
                 experiment: experiment,
                 test: test,
-                jobFile: jobFile.slice(8),
+                jobFile: jobFile,
                 operation: rowResult.operation,
                 targetTable:targetTable,
                 PK: pkValue,
@@ -120,8 +133,8 @@ const runJob = async (params) => {
                 jobElapsed: jobElapsed,
                 latency: rowResult.latency,
                 velocity: null,
-                httpStatusCode: rowResult?.result?.$metadata?.httpStatusCode,
-                attempts: rowResult?.result?.$metadata?.attempts,
+                httpStatusCode: httpStatusCode,
+                attempts: attempts,
                 ConsumedCapacity: rowResult?.result?.ConsumedCapacity?.CapacityUnits
             };
 
@@ -130,6 +143,9 @@ const runJob = async (params) => {
             // to see if we can include a complete second summary for a finished second.
             //
             // jobResults.push(rowSummary);
+        }
+        if(jobSecond === 1) {
+            rowSummary['velocity'] = requestsThisSecond;
         }
         jobResults.push(rowSummary); // final summary
     }

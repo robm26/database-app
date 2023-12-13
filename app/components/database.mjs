@@ -15,8 +15,7 @@ const mysqlPool = pool.promise();
 
 const runPartiQL = async (sql) => {
 
-    // console.log(sql);
-    // console.log();
+    let revisedSql = sql;
 
     let latency = 0;
     let response;
@@ -24,13 +23,36 @@ const runPartiQL = async (sql) => {
     let timeEnd;
 
     let operation = (sql).trim().split(" ")[0].toLowerCase();
+    let statementParams = [];
+    let sqlDocString;
 
-    const command = new ExecuteStatementCommand({
-        Statement: sql,
-        Parameters: [false],
+    if(operation === 'insert') {
+
+        if(sql.length > 0) {
+            let newDoc = {};
+            let sqlInsertPart = sql.slice(0, sql.search('VALUE'));
+
+            sqlDocString = sql.slice(sql.search('VALUE') + 6, sql.lastIndexOf(';'));
+
+            let sqlDoc = JSON.parse(sqlDocString.replaceAll("'", "\""));
+            let docKeys = Object.keys(sqlDoc);
+
+            revisedSql = sqlInsertPart + 'VALUE {' + docKeys.map((key, index) => {
+                statementParams.push(sqlDoc[key]);
+                return "'" +  key + "':?";
+            }) + '};';
+        }
+    }
+    let cParams = {
+        Statement: revisedSql,
         ConsistentRead: false,
         ReturnConsumedCapacity: "TOTAL"
-    });
+    };
+    if(statementParams.length > 0) {
+        cParams['Parameters'] = statementParams;
+    }
+
+    let command = new ExecuteStatementCommand(cParams);
 
     try{
         timeStart = new Date();
@@ -39,22 +61,25 @@ const runPartiQL = async (sql) => {
     }  catch (error) {
         timeEnd = new Date();
         latency = timeEnd - timeStart;
+
+        if(sqlDocString?.length > 100) {
+            sqlDocString = sqlDocString.slice(0, 100) + ' ...';
+        }
+
         const errorSummary = {
             error: {
-                message: error.name,
-                code:'http ' + error.$metadata.httpStatusCode
-                // name: error.name,
+                code: error.$metadata.httpStatusCode,
+                name: error.name,
                 // fault: error.$fault,
                 // httpStatusCode: error.$metadata.httpStatusCode,
-                // requestId: error.$metadata.requestId,
-                // attempts: error.$metadata.attempts,
-                // totalRetryDelay: error.$metadata.totalRetryDelay
+                requestId: error.$metadata.requestId,
+                attempts: error.$metadata.attempts,
+                totalRetryDelay: error.$metadata.totalRetryDelay,
+                Item: sqlDocString
             },
             affectedRows: 0
         };
-        // console.log(sql);
-
-        console.log(JSON.stringify(error, null, 2));
+        console.error(JSON.stringify(errorSummary, null, 2));
 
         return({result:errorSummary, latency:latency, operation: operation});
     }

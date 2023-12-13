@@ -4,7 +4,7 @@ import React from "react";
 import * as fs from 'node:fs/promises';
 import { useActionData, useLoaderData, Form, Link} from "@remix-run/react";
 import { STSClient, GetCallerIdentityCommand } from "@aws-sdk/client-sts";
-import { DynamoDBClient, DescribeEndpointsCommand, CreateTableCommand, DeleteTableCommand, ListTablesCommand} from "@aws-sdk/client-dynamodb";
+import { DynamoDBClient, DescribeEndpointsCommand, CreateTableCommand, DeleteTableCommand, waitUntilTableExists, waitUntilTableNotExists} from "@aws-sdk/client-dynamodb";
 import { config } from "../components/mysql-credentials.mjs";
 import { runSql } from "../components/database.mjs";
 
@@ -12,8 +12,8 @@ import { runSql } from "../components/database.mjs";
 export async function action({ params, request }) {
     const body = await request.formData();
     const action = body.get("_action");
-    console.log('\naction ' + action);
-    console.log('body ' + JSON.stringify(body, null, 2));
+    // console.log('\naction ' + action);
+    // console.log('body ' + JSON.stringify(body, null, 2));
 
     let dbEngine;
     let fileContents;
@@ -36,6 +36,7 @@ export async function action({ params, request }) {
     }
 
     if(action === 'dynamodbCreate') {
+
         const ddbClient = new DynamoDBClient({});
 
         const dynamodbAllFiles = await fs.readdir('./setup/dynamodb');
@@ -49,6 +50,10 @@ export async function action({ params, request }) {
 
             try {
                 ddbResponse = await ddbClient.send(ddbCommand);
+                if(counter === dynamodbSetupFiles.length - 1) {
+                    await waitUntilTableExists({client: ddbClient, maxWaitTime: 180}, {TableName: file.slice(0, -5)});
+                }
+
             } catch (error) {
                 error['table'] = JSON.parse(newTableJson).TableName;
                 errors.push(error);
@@ -56,7 +61,52 @@ export async function action({ params, request }) {
                 counter += 1;
             }
         }
+
         status = 'processed: ' + counter;
+    }
+    if (action.slice(0,12) === 'mysqlReceate') {
+        console.log(' ***** recreating table ' + action.slice(13, 999));
+        const tableName = action.slice(13, 999);
+
+        let sql = 'DROP TABLE IF EXISTS ' + tableName + ';';
+        let result = await runSql(sql);
+
+        sql = await fs.readFile('./setup/mysql/' + tableName + '.sql', 'utf-8');
+        result = await runSql(sql);
+
+    }
+
+    if (action.slice(0,15) === 'dynamodbReceate') {
+
+        const ddbClient = new DynamoDBClient({});
+
+        const tableName = action.slice(16, 999);
+
+        const newTableJson = await fs.readFile('./setup/dynamodb/' + tableName + '.json', 'utf-8');
+
+        const ddbCommandDelete = new DeleteTableCommand({TableName: tableName});
+        const ddbCommandCreate = new CreateTableCommand(JSON.parse(newTableJson));
+
+        let ddbResponse;
+
+        try {
+            ddbResponse = await ddbClient.send(ddbCommandDelete);
+            await waitUntilTableNotExists({client: ddbClient, maxWaitTime: 180}, { TableName: tableName });
+
+        } catch (error) {
+            error['table'] = tableName;
+            errors.push(error);
+        }
+
+        try {
+            ddbResponse = await ddbClient.send(ddbCommandCreate);
+            await waitUntilTableExists({client: ddbClient, maxWaitTime: 180}, { TableName: tableName });
+
+        } catch (error) {
+            error['table'] = tableName;
+            errors.push(error);
+        }
+
     }
 
     if(['.sql', 'json'].includes(action?.slice(-4)) ) {
@@ -168,6 +218,14 @@ export default function Setup() {
                                 <pre id="json">
                                     {actionData?.fileContentsMysql}
                                 </pre>
+                            <br/>
+                            {!actionData?.fileContentsMysql ? null : (
+                                <div>
+                                    <button type='submit' name='_action' value={'mysqlReceate-' + actionData.action.slice(0, -4)} className='mysqlSetupButton'>
+                                        recreate table</button>
+                                </div>
+                            )}
+
                         </div>
 
                     </div>
@@ -231,6 +289,13 @@ export default function Setup() {
                                 <pre id="json">
                                     {actionData?.fileContentsDynamodb.trim()}
                                 </pre>
+                                <br/>
+                                {!actionData?.fileContentsDynamodb.trim() ? null : (
+                                    <div>
+                                        <button type='submit' name='_action' value={'dynamodbReceate-' + actionData.action.slice(0, -5)} className='ddbSetupButton'>
+                                            recreate table</button>
+                                    </div>
+                                )}
                             </div>
                         )}
                     </td>
